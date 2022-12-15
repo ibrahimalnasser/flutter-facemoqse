@@ -30,7 +30,7 @@
 	<string>3</string>
 	<key>MinimumOSVersion</key>
 	<string>UIRequiredDeviceCapabilities</string>
-	<key>armv7</key>
+	<key>arm64</key>
 	<string>13.0</string>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
