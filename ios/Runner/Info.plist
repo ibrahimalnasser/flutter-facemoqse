@@ -28,6 +28,9 @@
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>3</string>
+	<key>UIRequiredDeviceCapabilities</key>
+	<array>
+	</array>
 	<key>MinimumOSVersion</key>
 	<string>13.0</string>
 	<key>LSApplicationQueriesSchemes</key>
