@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 //import 'firebase_options.dart';
 import 'package:facemosque/Screen/LanguageScreen.dart';
 import 'package:facemosque/Screen/adminControlScreen.dart';
@@ -86,6 +87,7 @@ Future<void> updateMosuqe() async {
 }
 
 void callbackDispatcher() {
+  WidgetsFlutterBinding.ensureInitialized();
   Workmanager().executeTask((task, inputData) async {
     TimeOfDay now = TimeOfDay.now();
     if (now.hour == 23) {
@@ -100,13 +102,14 @@ int? initScreen;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  Workmanager().initialize(callbackDispatcher, isInDebugMode: false);
-  await Workmanager().registerPeriodicTask(
-      'recallmousqedata', 'recallmousqedata',
-      frequency: Duration(hours: 1),
-      initialDelay: Duration(seconds: 10),
-      constraints: Constraints(networkType: NetworkType.connected));
+  if (Platform.isAndroid) {
+    Workmanager().initialize(callbackDispatcher, isInDebugMode: false);
+    await Workmanager().registerPeriodicTask(
+        'recallmousqedata', 'recallmousqedata',
+        frequency: Duration(hours: 1),
+        initialDelay: Duration(seconds: 10),
+        constraints: Constraints(networkType: NetworkType.connected));
+  }
   //set all alarm when app open
   calladan();
 
@@ -268,10 +271,10 @@ class _MyAppState extends State<MyApp> {
           primaryColor: MyApp.green,
           textTheme: const TextTheme(
             //set white color text with backgroud grean
-            headline1: TextStyle(
+            displayLarge: TextStyle(
                 color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20),
             //set black color text with backgroud grean
-            headline2: TextStyle(
+            displayMedium: TextStyle(
                 color: Colors.black, fontWeight: FontWeight.bold, fontSize: 20),
           ),
         ),

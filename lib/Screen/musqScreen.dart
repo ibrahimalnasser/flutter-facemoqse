@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:facemosque/widget/loctionmosque.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'dart:async';
 import 'package:facemosque/providers/buttonclick.dart';
 import 'package:facemosque/providers/fatchdata.dart';
 import 'package:facemosque/providers/mosques.dart';
@@ -65,7 +64,7 @@ class _MusqScreenState extends State<MusqScreen> with TickerProviderStateMixin {
                         language['mymosque'],
                         style: Theme.of(context)
                             .textTheme
-                            .headline2
+                            .displayMedium
                             ?.copyWith(fontSize: 16),
                       ),
                       onTap: () {
@@ -81,7 +80,7 @@ class _MusqScreenState extends State<MusqScreen> with TickerProviderStateMixin {
                         //but it well change the font size to 16
                         style: Theme.of(context)
                             .textTheme
-                            .headline2
+                            .displayMedium
                             ?.copyWith(fontSize: 16),
                       ),
                       onTap: () {
@@ -123,7 +122,7 @@ class _MusqScreenState extends State<MusqScreen> with TickerProviderStateMixin {
                                 //but it well change the font size to 16
                                 style: Theme.of(context)
                                     .textTheme
-                                    .headline1
+                                    .displayLarge
                                     ?.copyWith(fontSize: 16),
                               ),
                               subtitle: AutoSizeText(
@@ -134,7 +133,7 @@ class _MusqScreenState extends State<MusqScreen> with TickerProviderStateMixin {
                                 //but it well change the font size to 14
                                 style: Theme.of(context)
                                     .textTheme
-                                    .headline1
+                                    .displayLarge
                                     ?.copyWith(
                                         fontWeight: FontWeight.normal,
                                         fontSize: 14),
@@ -185,7 +184,7 @@ class _MusqScreenState extends State<MusqScreen> with TickerProviderStateMixin {
                           ),
                           ElevatedButton(
                             style: ButtonStyle(
-                                shape: MaterialStateProperty.all<
+                                shape: WidgetStateProperty.all<
                                         RoundedRectangleBorder>(
                                     RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(20.0),
@@ -237,7 +236,7 @@ class _MusqScreenState extends State<MusqScreen> with TickerProviderStateMixin {
                             mosquesforevent.name,
                             style: Theme.of(context)
                                 .textTheme
-                                .headline1
+                                .displayLarge
                                 ?.copyWith(fontSize: 16),
                           ),
                           subtitle: AutoSizeText(
@@ -245,7 +244,7 @@ class _MusqScreenState extends State<MusqScreen> with TickerProviderStateMixin {
                             '${mosquesforevent.country} , ${mosquesforevent.street}',
                             style: Theme.of(context)
                                 .textTheme
-                                .headline1
+                                .displayLarge
                                 ?.copyWith(
                                     fontSize: 14,
                                     fontWeight: FontWeight.normal),
@@ -297,7 +296,7 @@ class _MusqScreenState extends State<MusqScreen> with TickerProviderStateMixin {
             },
             style: Theme.of(context)
                 .textTheme
-                .headline1
+                .displayLarge
                 ?.copyWith(fontSize: 12, fontWeight: FontWeight.normal),
             decoration: InputDecoration(
               filled: false,
@@ -429,7 +428,7 @@ class _MusqScreenState extends State<MusqScreen> with TickerProviderStateMixin {
                           maxLines: 1,
                           style: Theme.of(context)
                               .textTheme
-                              .headline1
+                              .displayLarge
                               ?.copyWith(fontSize: 16),
                         ),
                         subtitle: AutoSizeText(
@@ -437,7 +436,7 @@ class _MusqScreenState extends State<MusqScreen> with TickerProviderStateMixin {
                           '${item.country} , ${item.street}',
                           style: Theme.of(context)
                               .textTheme
-                              .headline1
+                              .displayLarge
                               ?.copyWith(
                                   fontSize: 14, fontWeight: FontWeight.normal),
                         ),

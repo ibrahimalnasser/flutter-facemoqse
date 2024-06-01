@@ -46,7 +46,7 @@ class ThemeScreen extends StatelessWidget {
                     child: Center(
                       child: Text(
                         language['Select'],
-                        style: Theme.of(context).textTheme.headline2,
+                        style: Theme.of(context).textTheme.displayMedium,
                       ),
                     ),
                     onSelected: (Themea select) {
@@ -74,7 +74,8 @@ class ThemeScreen extends StatelessWidget {
                                 value: item,
                                 child: Text(
                                   item.theme,
-                                  style: Theme.of(context).textTheme.headline1,
+                                  style:
+                                      Theme.of(context).textTheme.displayLarge,
                                 ),
                               ))
                           .toList();
@@ -88,17 +89,16 @@ class ThemeScreen extends StatelessWidget {
                           .themeselected) {
                         await Provider.of<Respray>(context, listen: false)
                             .sendudp('White');
-                      }else{
-                         await Provider.of<Respray>(context, listen: false)
+                      } else {
+                        await Provider.of<Respray>(context, listen: false)
                             .sendudp('Black');
-                        
                       }
                     },
                     style: ButtonStyle(
-                        padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
+                        padding: WidgetStateProperty.all<EdgeInsetsGeometry>(
                             EdgeInsets.all(13)),
                         shape:
-                            MaterialStateProperty.all<RoundedRectangleBorder>(
+                            WidgetStateProperty.all<RoundedRectangleBorder>(
                                 RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(18.0),
                         )))),

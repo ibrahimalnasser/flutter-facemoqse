@@ -37,12 +37,10 @@ class LanguageScreen extends StatelessWidget {
               margin: const EdgeInsets.all(10),
               child: Text(
                 language['language'],
-                style: Theme.of(context).textTheme.headline2,
+                style: Theme.of(context).textTheme.displayMedium,
               ),
             ),
-            Image.asset(
-              'assets/images/lang.png'
-            ),
+            Image.asset('assets/images/lang.png'),
             SizedBox(
               height: sizedphone.height * 0.14,
               width: sizedphone.width * 0.8,
@@ -51,7 +49,7 @@ class LanguageScreen extends StatelessWidget {
                 child: Center(
                   child: Text(
                     language['selectlanguage'],
-                    style: Theme.of(context).textTheme.headline2,
+                    style: Theme.of(context).textTheme.displayMedium,
                   ),
                 ),
                 onSelected: (Language select) {
@@ -80,33 +78,32 @@ class LanguageScreen extends StatelessWidget {
                             value: item,
                             child: Text(
                               item.lang,
-                              style: Theme.of(context).textTheme.headline1,
+                              style: Theme.of(context).textTheme.displayLarge,
                             ),
                           ))
                       .toList();
                 },
               ),
             ),
-             ElevatedButton(
-                    child: Text(language['Change Language']),
-                    onPressed: () {
-                      if (Provider.of<Buttonclickp>(context, listen: false)
-                          .languageformosqueselected) {
-                        Provider.of<Respray>(context, listen: false)
-                            .sendudp('Arabic');
-                      } else {
-                        Provider.of<Respray>(context, listen: false)
-                            .sendudp('English');
-                      }
-                    },
-                    style: ButtonStyle(
-                        padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
-                            EdgeInsets.all(13)),
-                        shape:
-                            MaterialStateProperty.all<RoundedRectangleBorder>(
-                                RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(18.0),
-                        )))),
+            ElevatedButton(
+                child: Text(language['Change Language']),
+                onPressed: () {
+                  if (Provider.of<Buttonclickp>(context, listen: false)
+                      .languageformosqueselected) {
+                    Provider.of<Respray>(context, listen: false)
+                        .sendudp('Arabic');
+                  } else {
+                    Provider.of<Respray>(context, listen: false)
+                        .sendudp('English');
+                  }
+                },
+                style: ButtonStyle(
+                    padding: WidgetStateProperty.all<EdgeInsetsGeometry>(
+                        EdgeInsets.all(13)),
+                    shape: WidgetStateProperty.all<RoundedRectangleBorder>(
+                        RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(18.0),
+                    )))),
           ],
         ),
       ),

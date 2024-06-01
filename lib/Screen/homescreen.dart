@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:ffi';
 
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:facemosque/Screen/adminControlScreen.dart';
@@ -8,7 +7,6 @@ import 'package:facemosque/Screen/musqScreen.dart';
 import 'package:facemosque/providers/auth.dart';
 import 'package:facemosque/providers/fatchdata.dart';
 import 'package:facemosque/providers/mosque.dart';
-import 'package:facemosque/providers/respray.dart';
 import 'package:facemosque/widget/countdowntimer.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -22,7 +20,6 @@ import 'package:facemosque/widget/bottomnav.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:swipe/swipe.dart';
-import "package:flutter/material.dart";
 import "package:persistent_bottom_nav_bar/persistent_tab_view.dart";
 
 //import "package:persistent_bottom_nav_bar_example_project/custom-widget-tabs.widget.dart";
@@ -53,14 +50,16 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   NotificationHelper _notificationHelper = NotificationHelper();
-  late PersistentTabController _controller;
-  late bool _hideNavBar;
+  //late PersistentTabController _controller;
+  //late bool _hideNavBar;
   @override
   void initState() {
     read();
     super.initState();
-    _controller = PersistentTabController();
-    _hideNavBar = false;
+    // ignore: unused_local_variable
+    PersistentTabController _controller = PersistentTabController();
+    // ignore: unused_local_variable
+    bool _hideNavBar = false;
   }
 
   @override
@@ -260,7 +259,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                     : item.adan,
                                                 style: Theme.of(context)
                                                     .textTheme
-                                                    .headline1,
+                                                    .displayLarge,
                                                 textAlign: TextAlign.center,
                                               ),
                                               const SizedBox(),
@@ -277,7 +276,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                             : language['adan'],
                                                         style: Theme.of(context)
                                                             .textTheme
-                                                            .headline1),
+                                                            .displayLarge),
                                                     const SizedBox(),
                                                     Text(
                                                         item.Issharouq
@@ -286,7 +285,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                                 'prayer'],
                                                         style: Theme.of(context)
                                                             .textTheme
-                                                            .headline1),
+                                                            .displayLarge),
                                                   ],
                                                 ),
                                               if (!item.Issharouq)
@@ -299,7 +298,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                     Text(item.time,
                                                         style: Theme.of(context)
                                                             .textTheme
-                                                            .headline1),
+                                                            .displayLarge),
                                                     SizedBox(
                                                       width: sizedphone.width *
                                                           0.095,
@@ -308,7 +307,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                     Text(item.timeend,
                                                         style: Theme.of(context)
                                                             .textTheme
-                                                            .headline1),
+                                                            .displayLarge),
                                                   ],
                                                 ),
                                             ],
@@ -350,13 +349,13 @@ class _HomeScreenState extends State<HomeScreen> {
                                           : Text(language['Today\'s prayers are over'],
                                               style: Theme.of(context)
                                                   .textTheme
-                                                  .headline1)
+                                                  .displayLarge)
                                       : Text(
                                           language[
                                               'Select the mosque to see the last prayer'],
                                           style: Theme.of(context)
                                               .textTheme
-                                              .headline1!
+                                              .displayLarge!
                                               .copyWith(fontSize: 15)),
                                   titlel(language['todayaya']),
                                   Expanded(
@@ -392,7 +391,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
                                       style: Theme.of(context)
                                           .textTheme
-                                          .headline1!
+                                          .displayLarge!
                                           .copyWith(
                                             fontSize: 20,
                                           ),
@@ -431,7 +430,7 @@ class _HomeScreenState extends State<HomeScreen> {
         color: Color(0xFF94C973),
       ),
       alignment: Alignment.center,
-      child: Text(titlel, style: Theme.of(context).textTheme.headline1),
+      child: Text(titlel, style: Theme.of(context).textTheme.displayLarge),
     );
   }
 }

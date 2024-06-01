@@ -2,8 +2,6 @@ import 'package:facemosque/providers/fatchdata.dart';
 import 'package:facemosque/providers/mosque.dart';
 import 'package:facemosque/providers/respray.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/foundation/key.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:group_button/group_button.dart';
 import 'package:intl/intl.dart';
 import 'package:numberpicker/numberpicker.dart';
@@ -131,7 +129,7 @@ class _PrayerTimeSreenState extends State<PrayerTimeSreen> {
                           textAlign: TextAlign.center,
                           style: Theme.of(context)
                               .textTheme
-                              .headline1!
+                              .displayLarge!
                               .copyWith(fontWeight: FontWeight.normal),
                         ),
                         duration: const Duration(seconds: 1),
@@ -144,7 +142,7 @@ class _PrayerTimeSreenState extends State<PrayerTimeSreen> {
                           textAlign: TextAlign.center,
                           style: Theme.of(context)
                               .textTheme
-                              .headline1!
+                              .displayLarge!
                               .copyWith(fontWeight: FontWeight.normal),
                         ),
                         duration: const Duration(seconds: 1),
@@ -154,9 +152,9 @@ class _PrayerTimeSreenState extends State<PrayerTimeSreen> {
                     }
                   },
                   style: ButtonStyle(
-                      padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
+                      padding: WidgetStateProperty.all<EdgeInsetsGeometry>(
                           EdgeInsets.all(13)),
-                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                      shape: WidgetStateProperty.all<RoundedRectangleBorder>(
                           RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(18.0),
                       )))),
@@ -251,7 +249,7 @@ class _PrayerTimeSreenState extends State<PrayerTimeSreen> {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           SizedBox(),
-          Text(titlel, style: Theme.of(context).textTheme.headline1),
+          Text(titlel, style: Theme.of(context).textTheme.displayLarge),
           Container(
               height: s.height * 0.06,
               width: s.width * 0.1,
@@ -264,7 +262,7 @@ class _PrayerTimeSreenState extends State<PrayerTimeSreen> {
                   '$i',
                   style: Theme.of(context)
                       .textTheme
-                      .headline1!
+                      .displayLarge!
                       .copyWith(fontSize: 25),
                 ),
               ))

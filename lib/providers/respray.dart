@@ -6,7 +6,6 @@ import 'package:network_info_plus/network_info_plus.dart';
 
 import 'package:flutter/material.dart';
 //import 'package:flutter_socket_plugin/flutter_socket_plugin.dart';
-import 'package:udp/udp.dart';
 
 class Respray with ChangeNotifier {
   List<String> Ips = [];
@@ -72,7 +71,6 @@ class Respray with ChangeNotifier {
         print(
             '${addr.address} ${addr.host} ${addr.isLoopback} ${addr.rawAddress} ${addr.type.name}');
         if (addr.address.isNotEmpty) {
-          List<String> IpArray = addr.address.split(".");
           print(addr.rawAddress[0].toString() +
               "." +
               addr.rawAddress[1].toString() +
@@ -106,7 +104,7 @@ class Respray with ChangeNotifier {
       // or You can also get address using network_info_plus package
       final String subnet = ip.substring(0, ip.lastIndexOf('.'));
       final stream = HostScanner.getAllPingableDevices(subnet,
-          firstSubnet: 1, lastSubnet: 255, progressCallback: (progress) {
+          firstHostId: 1, lastHostId: 255, progressCallback: (progress) {
         print('Progress for host discovery : $progress');
       });
 

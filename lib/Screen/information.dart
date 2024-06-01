@@ -1,8 +1,6 @@
 import 'package:facemosque/Screen/adminControlScreen.dart';
 import 'package:facemosque/providers/auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/foundation/key.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/buttonclick.dart';

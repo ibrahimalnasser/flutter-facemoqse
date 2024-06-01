@@ -1,7 +1,6 @@
 import 'package:facemosque/providers/messagesetting.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:qr_flutter/qr_flutter.dart';
 
 import '../providers/buttonclick.dart';
 import '../providers/messagefromtaipc.dart';
@@ -33,7 +32,7 @@ class _SigninScreenforEventtate extends State<SigninScreenforEvent> {
             Align(
               alignment: Alignment.topCenter,
               child: Text(language['Register'],
-                  style: Theme.of(context).textTheme.headline2),
+                  style: Theme.of(context).textTheme.displayMedium),
             ),
             SizedBox(height: sizedphone.height * 0.1),
             Padding(
@@ -90,7 +89,7 @@ class _SigninScreenforEventtate extends State<SigninScreenforEvent> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                RaisedButton(
+                MaterialButton(
                   child: Text(language['Register']),
                   onPressed: () {
                     try {
@@ -141,7 +140,7 @@ class _SigninScreenforEventtate extends State<SigninScreenforEvent> {
                   color: Theme.of(context).primaryColor,
                   textColor: Colors.white,
                 ),
-                RaisedButton(
+                MaterialButton(
                   child: Text(language['Cancel']),
                   onPressed: () => Navigator.of(context).pop(),
                   shape: RoundedRectangleBorder(

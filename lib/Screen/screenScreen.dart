@@ -49,7 +49,7 @@ class ScreenScreen extends StatelessWidget {
                     child: Center(
                       child: Text(
                         language['Select'],
-                        style: Theme.of(context).textTheme.headline2,
+                        style: Theme.of(context).textTheme.displayMedium,
                       ),
                     ),
                     onSelected: (Screen select) {
@@ -77,7 +77,8 @@ class ScreenScreen extends StatelessWidget {
                                 value: item,
                                 child: Text(
                                   item.screen,
-                                  style: Theme.of(context).textTheme.headline1,
+                                  style:
+                                      Theme.of(context).textTheme.displayLarge,
                                 ),
                               ))
                           .toList();
@@ -97,10 +98,10 @@ class ScreenScreen extends StatelessWidget {
                       }
                     },
                     style: ButtonStyle(
-                        padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
+                        padding: WidgetStateProperty.all<EdgeInsetsGeometry>(
                             EdgeInsets.all(13)),
                         shape:
-                            MaterialStateProperty.all<RoundedRectangleBorder>(
+                            WidgetStateProperty.all<RoundedRectangleBorder>(
                                 RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(18.0),
                         )))),

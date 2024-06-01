@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/src/foundation/key.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/buttonclick.dart';
 import '../providers/respray.dart';
 
+// ignore: must_be_immutable
 class MessageScscreen extends StatelessWidget {
   static const routeName = '/message';
 
@@ -36,7 +35,7 @@ class MessageScscreen extends StatelessWidget {
                 onChanged: (value) {},
                 style: Theme.of(context)
                     .textTheme
-                    .headline2
+                    .displayMedium
                     ?.copyWith(fontSize: 12, fontWeight: FontWeight.normal),
                 decoration: InputDecoration(
                   filled: false,
@@ -50,38 +49,37 @@ class MessageScscreen extends StatelessWidget {
                 ),
               ),
             ),
-            SizedBox(height: sizedphone.height*0.1,),
-             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround
-              ,
+            SizedBox(
+              height: sizedphone.height * 0.1,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 ElevatedButton(
                     child: Text(language['Send Message']),
-                    onPressed: () async{
-                      if(_textcontroler.text.isNotEmpty)
-                         await Provider.of<Respray>(context, listen: false)
+                    onPressed: () async {
+                      if (_textcontroler.text.isNotEmpty)
+                        await Provider.of<Respray>(context, listen: false)
                             .sendudp('create_msg ${_textcontroler.text}');
-                            
                     },
                     style: ButtonStyle(
-                        padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
+                        padding: WidgetStateProperty.all<EdgeInsetsGeometry>(
                             EdgeInsets.all(13)),
-                        shape:
-                            MaterialStateProperty.all<RoundedRectangleBorder>(
-                                RoundedRectangleBorder(
+                        shape: WidgetStateProperty.all<RoundedRectangleBorder>(
+                            RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(18.0),
                         )))),
                 ElevatedButton(
                     child: Text(language['Delete Message']),
-                    onPressed: () async{
-                      await Provider.of<Respray>(context,listen: false).sendudp('del_msg');
+                    onPressed: () async {
+                      await Provider.of<Respray>(context, listen: false)
+                          .sendudp('del_msg');
                     },
                     style: ButtonStyle(
-                        padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
+                        padding: WidgetStateProperty.all<EdgeInsetsGeometry>(
                             EdgeInsets.all(13)),
-                        shape:
-                            MaterialStateProperty.all<RoundedRectangleBorder>(
-                                RoundedRectangleBorder(
+                        shape: WidgetStateProperty.all<RoundedRectangleBorder>(
+                            RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(18.0),
                         )))),
               ],

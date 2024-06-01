@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'package:provider/provider.dart';
@@ -35,7 +34,6 @@ class _HigiriScreenState extends State<HigiriScreen> {
 
   @override
   Widget build(BuildContext context) {
-    var sizedphone = MediaQuery.of(context).size;
     Map language = Provider.of<Buttonclickp>(context).languagepro;
     return Scaffold(
       body: Column(
@@ -67,10 +65,10 @@ class _HigiriScreenState extends State<HigiriScreen> {
               TextButton(
                 onPressed: isEmpty ? null : decrement,
                 style: TextButton.styleFrom(
+                  foregroundColor: Colors.black,
                   backgroundColor:
                       isEmpty ? Colors.white.withOpacity(0.2) : Colors.white,
                   fixedSize: const Size(100, 100),
-                  primary: Colors.black,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(24),
                   ),
@@ -89,10 +87,10 @@ class _HigiriScreenState extends State<HigiriScreen> {
               TextButton(
                 onPressed: isFull ? null : increment,
                 style: TextButton.styleFrom(
+                  foregroundColor: Colors.black,
                   backgroundColor:
                       isFull ? Colors.white.withOpacity(0.2) : Colors.white,
                   fixedSize: const Size(100, 100),
-                  primary: Colors.black,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(24),
                   ),
@@ -112,12 +110,14 @@ class _HigiriScreenState extends State<HigiriScreen> {
             child: ElevatedButton(
                 child: Text(language['Adding Days']),
                 onPressed: () {
-                  Provider.of<Respray>(context,listen: false).sendudp('Hijri ${count}').then((value) => print('sdf'));
+                  Provider.of<Respray>(context, listen: false)
+                      .sendudp('Hijri ${count}')
+                      .then((value) => print('sdf'));
                 },
                 style: ButtonStyle(
-                    padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
+                    padding: WidgetStateProperty.all<EdgeInsetsGeometry>(
                         EdgeInsets.all(13)),
-                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                    shape: WidgetStateProperty.all<RoundedRectangleBorder>(
                         RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(18.0),
                     )))),

@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:async';
-import 'dart:ffi';
 import 'package:facemosque/providers/mosque.dart';
 import 'package:facemosque/providers/mosques.dart';
 import 'package:flutter/foundation.dart';

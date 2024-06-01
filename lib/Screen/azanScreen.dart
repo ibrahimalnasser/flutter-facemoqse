@@ -1,12 +1,11 @@
 import 'package:facemosque/providers/respray.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/foundation/key.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:group_button/group_button.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/buttonclick.dart';
 
+// ignore: must_be_immutable
 class AzanScreen extends StatelessWidget {
   static const routeName = '/azan';
   GroupButtonController _controller = GroupButtonController();
@@ -62,9 +61,9 @@ class AzanScreen extends StatelessWidget {
                         .sendudp('$adan');
                   },
                   style: ButtonStyle(
-                      padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
+                      padding: WidgetStateProperty.all<EdgeInsetsGeometry>(
                           EdgeInsets.all(13)),
-                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                      shape: WidgetStateProperty.all<RoundedRectangleBorder>(
                           RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(18.0),
                       )))),

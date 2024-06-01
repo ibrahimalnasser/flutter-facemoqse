@@ -40,8 +40,6 @@ class _CountdownTimerState extends State<CountdownTimer> {
         Timer.periodic(Duration(seconds: 1), (_) => setCountDown());
   }
 
-
-
   void settimerformadan() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     DateTime now = DateFormat("hh:mm").parse(DateTime.now().hour.toString() +
@@ -69,15 +67,18 @@ class _CountdownTimerState extends State<CountdownTimer> {
           .parse(mosque.asr.split(':')[0] + ':' + mosque.asr.split(':')[1])
           .isAfter(now)) {
         timehm = mosque.asr.split(':');
-      } else if (DateFormat("hh:mm").parse(
-          mosque.magrib.split(':')[0] + ':' + mosque.magrib.split(':')[1]).isAfter(now)) {
+      } else if (DateFormat("hh:mm")
+          .parse(
+              mosque.magrib.split(':')[0] + ':' + mosque.magrib.split(':')[1])
+          .isAfter(now)) {
         timehm = mosque.magrib.split(':');
-      } else if (DateFormat("hh:mm").parse(
-          mosque.isha.split(':')[0] + ':' + mosque.isha.split(':')[1]).isBefore(now)) {
+      } else if (DateFormat("hh:mm")
+          .parse(mosque.isha.split(':')[0] + ':' + mosque.isha.split(':')[1])
+          .isBefore(now)) {
         timehm = mosque.isha.split(':');
-      } else{
+      } else {
         timehm = ['0', '0'];
-         countdownTimer?.cancel();
+        countdownTimer?.cancel();
       }
 
       DateTime tempDate =
@@ -86,10 +87,9 @@ class _CountdownTimerState extends State<CountdownTimer> {
       myDuration = Duration(
         seconds: tempDate.difference(now).inSeconds,
       );
-      if(myDuration.inHours.remainder(24)<0){
-        myDuration=Duration.zero;
+      if (myDuration.inHours.remainder(24) < 0) {
+        myDuration = Duration.zero;
       }
-
     }
   }
 
@@ -120,7 +120,7 @@ class _CountdownTimerState extends State<CountdownTimer> {
         // Step 8
         Text(
       '$hours:$minutes:$seconds',
-      style: Theme.of(context).textTheme.headline1,
+      style: Theme.of(context).textTheme.displayLarge,
     );
   }
 }

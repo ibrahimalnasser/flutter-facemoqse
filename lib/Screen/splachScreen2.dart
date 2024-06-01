@@ -1,20 +1,16 @@
 
-import 'package:animated_text_kit/animated_text_kit.dart';
-import 'package:animations/animations.dart';
 import 'package:facemosque/Screen/homescreen.dart';
 import 'package:facemosque/Screen/onbordingScreen2.dart';
 import 'package:facemosque/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_statusbarcolor_ns/flutter_statusbarcolor_ns.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:async';
 
 import '../providers/auth.dart';
 import '../providers/buttonclick.dart';
 import '../providers/fatchdata.dart';
 import '../providers/messagesetting.dart';
-import '../providers/respray.dart';
 
 
 

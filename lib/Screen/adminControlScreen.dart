@@ -60,7 +60,7 @@ class _AdminControlScreenState extends State<AdminControlScreen> {
     late ConnectivityResult result;
     // Platform messages may fail, so we use a try/catch PlatformException.
     try {
-      result = await _connectivity.checkConnectivity();
+      result = (await _connectivity.checkConnectivity()) as ConnectivityResult;
     } on PlatformException catch (e) {
       print('Couldn\'t check connectivity status $e');
       return;
@@ -87,8 +87,10 @@ class _AdminControlScreenState extends State<AdminControlScreen> {
     super.initState();
     initConnectivity();
 
-    _connectivitySubscription =
-        _connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
+    _connectivitySubscription = _connectivity.onConnectivityChanged.listen(
+            _updateConnectionStatus as void Function(
+                List<ConnectivityResult> event)?)
+        as StreamSubscription<ConnectivityResult>;
   }
 
   @override
@@ -175,7 +177,7 @@ class _AdminControlScreenState extends State<AdminControlScreen> {
                     children: [
                       Text(
                         "${language['Admin']}",
-                        style: Theme.of(context).textTheme.headline1,
+                        style: Theme.of(context).textTheme.displayLarge,
                       ),
                     ],
                   ),
@@ -376,7 +378,7 @@ class _AdminControlScreenState extends State<AdminControlScreen> {
                                               textAlign: TextAlign.center,
                                               style: Theme.of(context)
                                                   .textTheme
-                                                  .headline1!
+                                                  .displayLarge!
                                                   .copyWith(
                                                       fontWeight:
                                                           FontWeight.normal),
@@ -445,17 +447,17 @@ class _AdminControlScreenState extends State<AdminControlScreen> {
                       Provider.of<Auth>(context, listen: false).logout();
                     },
                     style: ButtonStyle(
-                        padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
+                        padding: WidgetStateProperty.all<EdgeInsetsGeometry>(
                             EdgeInsets.all(13)),
                         shape:
-                            MaterialStateProperty.all<RoundedRectangleBorder>(
+                            WidgetStateProperty.all<RoundedRectangleBorder>(
                                 RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(18.0),
                         )))),
                 _connectionStatus.name != 'wifi'
                     ? Text(
                         language['Connect to wifi'],
-                        style: Theme.of(context).textTheme.headline2,
+                        style: Theme.of(context).textTheme.displayMedium,
                       )
                     : Provider.of<Respray>(context).isdoneserarching == false
                         ? ElevatedButton(
@@ -474,16 +476,16 @@ class _AdminControlScreenState extends State<AdminControlScreen> {
                                   .setisdoneserarching(false);
                             },
                             style: ButtonStyle(
-                                padding: MaterialStateProperty.all<
+                                padding: WidgetStateProperty.all<
                                     EdgeInsetsGeometry>(EdgeInsets.all(13)),
-                                shape: MaterialStateProperty.all<
+                                shape: WidgetStateProperty.all<
                                         RoundedRectangleBorder>(
                                     RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(18.0),
                                 ))))
                         : Text(
                             language['wait for IP to find'],
-                            style: Theme.of(context).textTheme.headline2,
+                            style: Theme.of(context).textTheme.displayMedium,
                           ),
                 ElevatedButton(
                     child: Text(language['Sync']),
@@ -492,10 +494,10 @@ class _AdminControlScreenState extends State<AdminControlScreen> {
                           .sendudp('sync');
                     },
                     style: ButtonStyle(
-                        padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
+                        padding: WidgetStateProperty.all<EdgeInsetsGeometry>(
                             EdgeInsets.all(13)),
                         shape:
-                            MaterialStateProperty.all<RoundedRectangleBorder>(
+                            WidgetStateProperty.all<RoundedRectangleBorder>(
                                 RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(18.0),
                         )))),
@@ -533,7 +535,7 @@ class _AdminControlScreenState extends State<AdminControlScreen> {
           textAlign: TextAlign.center,
           style: Theme.of(context)
               .textTheme
-              .headline1!
+              .displayLarge!
               .copyWith(fontWeight: FontWeight.normal),
         ),
         duration: const Duration(seconds: 1),

@@ -1,7 +1,4 @@
 import 'package:facemosque/providers/messagefromtaipc.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:firebase_messaging_platform_interface/src/remote_message.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_native_timezone/flutter_native_timezone.dart';
 import 'package:timezone/data/latest.dart' as tz;
@@ -15,7 +12,7 @@ class NotificationHelper {
     tz.initializeTimeZones();
     //get local time zone
     final String timeZone = await FlutterNativeTimezone.getLocalTimezone();
-   //get location from timezone
+    //get location from timezone
     tz.setLocalLocation(tz.getLocation(timeZone));
   }
 
@@ -23,12 +20,12 @@ class NotificationHelper {
   initializeNotification() async {
     _configureLocalTimeZone();
     //ios setting but i not set
-    const IOSInitializationSettings initializationSettingsIOS =
-        IOSInitializationSettings();
-   //set icon notification the same as icon app
+    const DarwinInitializationSettings initializationSettingsIOS =
+        DarwinInitializationSettings();
+    //set icon notification the same as icon app
     const AndroidInitializationSettings initializationSettingsAndroid =
         AndroidInitializationSettings("@mipmap/ic_launcher");
-   //Initialize setting notification
+    //Initialize setting notification
     const InitializationSettings initializationSettings =
         InitializationSettings(
       iOS: initializationSettingsIOS,
@@ -38,7 +35,7 @@ class NotificationHelper {
   }
 
   /// Set right date and time for notifications
-  //if time adan has pass the day  it well add day 
+  //if time adan has pass the day  it well add day
   tz.TZDateTime _convertTime(int hour, int minutes) {
     final tz.TZDateTime now = tz.TZDateTime.now(tz.local);
     tz.TZDateTime scheduleDate = tz.TZDateTime(
@@ -54,11 +51,12 @@ class NotificationHelper {
     }
     return scheduleDate;
   }
-//Notification for firebase 
+
+//Notification for firebase
   showNot(MessageFromTaipc message) async {
     await flutterLocalNotificationsPlugin.show(
-     message.hashCode,
-     message.title,
+      message.hashCode,
+      message.title,
       message.message,
       NotificationDetails(
         android: AndroidNotificationDetails(
@@ -69,7 +67,7 @@ class NotificationHelper {
           priority: Priority.high,
           playSound: true,
         ),
-        iOS: IOSNotificationDetails(sound: 'assets/mp3/notification.mp3'),
+        iOS: DarwinNotificationDetails(sound: 'assets/mp3/notification.mp3'),
       ),
       payload: 'It could be anything you pass',
     );
@@ -98,7 +96,7 @@ class NotificationHelper {
           priority: Priority.high,
           sound: RawResourceAndroidNotificationSound(sound),
         ),
-        iOS: IOSNotificationDetails(sound: '$sound.mp3'),
+        iOS: DarwinNotificationDetails(sound: '$sound.mp3'),
       ),
       androidAllowWhileIdle: true,
       uiLocalNotificationDateInterpretation:

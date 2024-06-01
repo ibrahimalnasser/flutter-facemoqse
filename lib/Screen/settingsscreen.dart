@@ -21,15 +21,16 @@ class SettingsScreen extends StatefulWidget {
   @override
   State<SettingsScreen> createState() => _SettingsScreenState();
 }
+
 enum Language1 { englich, arabic }
-
-
 
 class _SettingsScreenState extends State<SettingsScreen> {
   NotificationHelper _notificationHelper = NotificationHelper();
   @override
   Widget build(BuildContext context) {
-      Language1? language1=Provider.of<Buttonclickp>(context).languageselected?Language1.arabic:Language1.englich;
+    Language1? language1 = Provider.of<Buttonclickp>(context).languageselected
+        ? Language1.arabic
+        : Language1.englich;
 
     Mosques mosquefollow =
         Provider.of<FatchData>(context, listen: false).mosqueFollow;
@@ -63,7 +64,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               language['azannotification'],
               //give text style of headline 1 (I set in main.dart)
               //but it well change the font size to 20
-              style: Theme.of(context).textTheme.headline1,
+              style: Theme.of(context).textTheme.displayLarge,
             ),
           ),
           SizedBox(
@@ -103,7 +104,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   language['fajer'],
                   style: Theme.of(context)
                       .textTheme
-                      .headline2
+                      .displayMedium
                       ?.copyWith(fontSize: 14),
                 ),
                 Transform.scale(
@@ -133,7 +134,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   language['dhuhr'],
                   style: Theme.of(context)
                       .textTheme
-                      .headline2
+                      .displayMedium
                       ?.copyWith(fontSize: 14),
                 ),
                 Transform.scale(
@@ -162,7 +163,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   language['asr'],
                   style: Theme.of(context)
                       .textTheme
-                      .headline2
+                      .displayMedium
                       ?.copyWith(fontSize: 14),
                 )
               ],
@@ -197,7 +198,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 language['magrib'],
                 style: Theme.of(context)
                     .textTheme
-                    .headline2
+                    .displayMedium
                     ?.copyWith(fontSize: 14),
               ),
               Transform.scale(
@@ -226,7 +227,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 language['isha'],
                 style: Theme.of(context)
                     .textTheme
-                    .headline2
+                    .displayMedium
                     ?.copyWith(fontSize: 14),
               )
             ],
@@ -244,21 +245,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
             margin: const EdgeInsets.all(10),
             child: Text(
               language['language'],
-              style: Theme.of(context).textTheme.headline1,
+              style: Theme.of(context).textTheme.displayLarge,
             ),
           ),
-            SizedBox(
+          SizedBox(
             height: sizedphone.height * 0.1,
           ),
-          
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               Transform.scale(
                 scale: 1.3,
                 child: Radio<Language1?>(
-                    groupValue:
-                        Language1.englich,
+                    groupValue: Language1.englich,
                     value: language1,
                     onChanged: (val) {
                       Provider.of<Buttonclickp>(context, listen: false)
@@ -268,12 +267,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
               Text(
                 l[0].lang,
-                style:  Theme.of(context).textTheme.headline2,
+                style: Theme.of(context).textTheme.displayMedium,
               ),
               Transform.scale(
                 scale: 1.3,
                 child: Radio<Language1?>(
-                    groupValue:Language1.arabic,
+                    groupValue: Language1.arabic,
                     value: language1,
                     onChanged: (val) {
                       Provider.of<Buttonclickp>(context, listen: false)
@@ -283,7 +282,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
               Text(
                 l[1].lang,
-                style: Theme.of(context).textTheme.headline2,
+                style: Theme.of(context).textTheme.displayMedium,
               )
             ],
           ),

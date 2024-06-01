@@ -1,13 +1,10 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:facemosque/Screen/signinScreenforevent.dart';
 import 'package:facemosque/providers/buttonclick.dart';
 import 'package:facemosque/providers/messagefromtaipc.dart';
 import 'package:facemosque/providers/messagesetting.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
@@ -64,7 +61,7 @@ class _EventNotificationsState extends State<EventNotifications> {
           child: Text(
             //show value(ar,en) of key eventnotifications
             language['eventnotifications'],
-            style: Theme.of(context).textTheme.headline1,
+            style: Theme.of(context).textTheme.displayLarge,
           ),
         ),
         Container(
@@ -93,15 +90,18 @@ class _EventNotificationsState extends State<EventNotifications> {
                         maxLines: 2,
                         style: Theme.of(context)
                             .textTheme
-                            .headline2
+                            .displayMedium
                             ?.copyWith(fontSize: 16),
                       ),
                       subtitle: AutoSizeText(
                         minFontSize: 14,
                         maxLines: 25,
                         item.message,
-                        style: Theme.of(context).textTheme.headline2!.copyWith(
-                            fontSize: 14, fontWeight: FontWeight.normal),
+                        style: Theme.of(context)
+                            .textTheme
+                            .displayMedium!
+                            .copyWith(
+                                fontSize: 14, fontWeight: FontWeight.normal),
                       ),
                     ),
                     Container(
@@ -199,7 +199,7 @@ class _EventNotificationsState extends State<EventNotifications> {
                                             alignment: Alignment.center,
                                             height: sizedphone.height * 0.3,
                                             width: sizedphone.width * 0.7,
-                                            child: QrImage(
+                                            child: QrImageView(
                                               data: prefs.getString(
                                                   '${item.eventId}')!,
                                               version: QrVersions.auto,

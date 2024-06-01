@@ -1,12 +1,6 @@
-import 'package:curved_navigation_bar/curved_navigation_bar.dart';
-import 'package:facemosque/Screen/eventnotifications.dart';
-import 'package:facemosque/Screen/homescreen.dart';
-import 'package:facemosque/Screen/musqScreen.dart';
-import 'package:facemosque/Screen/settingsscreen.dart';
 import 'package:facemosque/providers/buttonclick.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
 
 /*class MyStatefulWidget extends StatefulWidget {
   const MyStatefulWidget({super.key});

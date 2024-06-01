@@ -15,7 +15,7 @@ class _OnbordingScreen2State extends State<OnbordingScreen2> {
     var sizedphone = MediaQuery.of(context).size;
     return OnBoardingScreen2(
       onSkip: () {
-       Navigator.pushReplacementNamed(context, HomeScreen.routeName);
+        Navigator.pushReplacementNamed(context, HomeScreen.routeName);
       },
       showPrevNextButton: true,
       showIndicator: true,
@@ -216,7 +216,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen2> {
   final PageController _pageController = PageController(initialPage: 0);
   int currentIndex = 0;
   final _curve = Curves.easeInOut;
-  final _overlayColor = MaterialStateProperty.all(Colors.transparent);
+  final _overlayColor = WidgetStateProperty.all(Colors.transparent);
 
   _nextPage() {
     _pageController.nextPage(
