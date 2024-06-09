@@ -3,10 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/buttonclick.dart';
+import '../providers/fatchdata.dart';
 import '../providers/messagefromtaipc.dart';
+import '../providers/mosques.dart';
 
 class SigninScreenforEvent extends StatefulWidget {
   static const routeName = '/signinforEvent';
+
+  const SigninScreenforEvent({super.key});
 
   @override
   State<SigninScreenforEvent> createState() => _SigninScreenforEventtate();
@@ -22,9 +26,18 @@ class _SigninScreenforEventtate extends State<SigninScreenforEvent> {
     Map language = Provider.of<Buttonclickp>(context).languagepro;
     final argsmessage =
         ModalRoute.of(context)!.settings.arguments as MessageFromTaipc;
-
+    Mosques mosquesforevent = Provider.of<FatchData>(context).mosqueFollowevent;
+    print('---------------->Test Message');
+    print(mosquesforevent);
     return Scaffold(
       resizeToAvoidBottomInset: false,
+      appBar: AppBar(
+        leading: IconButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            icon: const Icon(Icons.arrow_back_ios)),
+      ),
       body: SafeArea(
         child: ListView(
           children: [
@@ -89,30 +102,57 @@ class _SigninScreenforEventtate extends State<SigninScreenforEvent> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                MaterialButton(
+                ElevatedButton(
                   child: Text(language['Register']),
-                  onPressed: () {
+                  onPressed: () async {
                     try {
-                      Provider.of<MessageSetting>(context, listen: false)
+                      int m = await Provider.of<MessageSetting>(context,
+                              listen: false)
                           .senddatauserforevent(
                               _firestnameController.text,
                               _lastnameController.text,
                               _nomberController.text,
-                              argsmessage);
-                      showDialog(
-                        context: context,
-                        builder: (ctx) => AlertDialog(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30),
+                              argsmessage,
+                              mosquesforevent.mosqueid);
+
+                      if (m == 200) {
+                        showDialog(
+                          context: context,
+                          builder: (ctx) => AlertDialog(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30),
+                            ),
+                            title: Text(language['Success']),
+                            content: Text(language['You\'r Register Success']),
                           ),
-                          title: Text(language['Success']),
-                          content: Text(language['You\'r Register Success']),
-                        ),
-                      );
-                      Future.delayed(const Duration(seconds: 1), () {
-                        Navigator.of(context).pop();
-                        Navigator.of(context).pop();
-                      });
+                        );
+                        Future.delayed(const Duration(seconds: 1), () {
+                          Navigator.of(context).pop();
+                          Navigator.of(context).pop();
+                        });
+                      } else {
+                        showDialog(
+                          context: context,
+                          builder: (ctx) => AlertDialog(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(40),
+                            ),
+                            title: Text(language['Erorr']),
+                            content: Text(
+                                language['Sorry, you cannot register'] +
+                                    " " +
+                                    m.toString()),
+                            actions: <Widget>[
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                                child: Text(language['yes']),
+                              ),
+                            ],
+                          ),
+                        );
+                      }
                     } catch (e) {
                       showDialog(
                         context: context,
@@ -134,20 +174,28 @@ class _SigninScreenforEventtate extends State<SigninScreenforEvent> {
                       );
                     }
                   },
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30)),
-                  padding: EdgeInsets.symmetric(horizontal: 30, vertical: 8),
-                  color: Theme.of(context).primaryColor,
-                  textColor: Colors.white,
+                  style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30)),
+                      padding:
+                          const EdgeInsets.symmetric(horizontal: 30, vertical: 8),
+                      shadowColor: Theme.of(context).primaryColor,
+                      textStyle: const TextStyle(
+                        color: Colors.white,
+                      )),
                 ),
-                MaterialButton(
+                ElevatedButton(
                   child: Text(language['Cancel']),
                   onPressed: () => Navigator.of(context).pop(),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30)),
-                  padding: EdgeInsets.symmetric(horizontal: 30, vertical: 8),
-                  color: Theme.of(context).primaryColor,
-                  textColor: Colors.white,
+                  style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30)),
+                      padding:
+                          const EdgeInsets.symmetric(horizontal: 30, vertical: 8),
+                      shadowColor: Theme.of(context).primaryColor,
+                      textStyle: const TextStyle(
+                        color: Colors.white,
+                      )),
                 ),
               ],
             ),

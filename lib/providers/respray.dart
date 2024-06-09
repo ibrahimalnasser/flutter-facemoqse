@@ -33,20 +33,24 @@ class Respray with ChangeNotifier {
     printIps();
 
     for (var i = 0; i < ipaddress.length; i++) {
-      var DESTINATION_ADDRESS = InternetAddress(ipaddress[i]);
+      var destinationAddress = InternetAddress(ipaddress[i]);
 
       RawDatagramSocket.bind(InternetAddress.anyIPv4, 44092)
           .then((RawDatagramSocket udpSocket) {
         udpSocket.broadcastEnabled = true;
-        udpSocket.listen((e) {
+        print(data);
+        /* udpSocket.listen((e) {
           Datagram? dg = udpSocket.receive();
           if (dg != null) {
             // ipaddress = dg.address.address;
             print("received ${dg.address}");
           }
-        });
+        });*/
         List<int> data1 = utf8.encode(data);
-        udpSocket.send(data1, DESTINATION_ADDRESS, 44092);
+        print(data1);
+        int d = udpSocket.send(data1, destinationAddress, 44092);
+        print("Testing");
+        print(d);
         udpSocket.close();
       });
     }
@@ -97,7 +101,7 @@ class Respray with ChangeNotifier {
     /// Initialize Ip Address
     final info = NetworkInfo();
     var hostAddress = await info.getWifiIP();
-    print(hostAddress.toString());
+
     if (hostAddress != null) {
       String ip = hostAddress;
 
@@ -107,13 +111,15 @@ class Respray with ChangeNotifier {
           firstHostId: 1, lastHostId: 255, progressCallback: (progress) {
         print('Progress for host discovery : $progress');
       });
+      // ignore: unused_label
+      progressCallback:
+      (progress) {};
 
       stream.listen((host) async {
         //Same host can be emitted multiple times
         //Use Set<ActiveHost> instead of List<ActiveHost>
-        print('Found device: ${await host.address}');
-        sendudp(await host.address);
-        Ip.add(await host.address);
+        sendudp(host.address);
+        Ip.add(host.address);
       }, onDone: () {
         print('Scan completed');
       }); // Don't forget to cancel the stream when not in use.

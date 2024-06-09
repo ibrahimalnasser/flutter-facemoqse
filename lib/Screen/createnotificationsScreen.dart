@@ -9,6 +9,8 @@ import '../providers/http_exception.dart';
 class CreatenotificationsScreen extends StatefulWidget {
   static const routeName = '/evetnotification';
 
+  const CreatenotificationsScreen({super.key});
+
   @override
   State<CreatenotificationsScreen> createState() =>
       _CreatenotificationsScreen();
@@ -43,11 +45,19 @@ class _CreatenotificationsScreen extends State<CreatenotificationsScreen> {
     }
   }
 
+//todo: #10 chang the input of the maximum number of people from text field to a number to avoid wrong inputs from the user @ibrahimalnasser
   @override
   Widget build(BuildContext context) {
     var sizedphone = MediaQuery.of(context).size;
     Map language = Provider.of<Buttonclickp>(context).languagepro;
     return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            icon: const Icon(Icons.arrow_back_ios)),
+      ),
       resizeToAvoidBottomInset: false,
       body: SafeArea(
         child: Form(
@@ -87,8 +97,9 @@ class _CreatenotificationsScreen extends State<CreatenotificationsScreen> {
                   ),
                   keyboardType: TextInputType.text,
                   validator: (val) {
-                    if (val!.isEmpty)
+                    if (val!.isEmpty) {
                       return throw HttpException(language['fill TextFild']);
+                    }
                     return null;
                   },
                 ),
@@ -109,7 +120,7 @@ class _CreatenotificationsScreen extends State<CreatenotificationsScreen> {
                       ),
                     ],
                   ),
-                  SizedBox(),
+                  const SizedBox(),
                   ButtonTheme(
                     minWidth: 50.0,
                     height: 150.0,
@@ -165,10 +176,9 @@ class _CreatenotificationsScreen extends State<CreatenotificationsScreen> {
                         style: ButtonStyle(
                             padding:
                                 WidgetStateProperty.all<EdgeInsetsGeometry>(
-                                    EdgeInsets.all(13)),
-                            shape:
-                                WidgetStateProperty.all<RoundedRectangleBorder>(
-                                    RoundedRectangleBorder(
+                                    const EdgeInsets.all(13)),
+                            shape: WidgetStateProperty.all<
+                                RoundedRectangleBorder>(RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(18.0),
                             )))),
                   ),
@@ -188,7 +198,9 @@ class _CreatenotificationsScreen extends State<CreatenotificationsScreen> {
                     // obscureText: true,
                     validator: _massageMode == MassageMode.Even
                         ? (val) {
-                            if (val == '') return language['set Number'];
+                            if (val == '' || val == '0') {
+                              return language['set Number'];
+                            }
                             return null;
                           }
                         : null,

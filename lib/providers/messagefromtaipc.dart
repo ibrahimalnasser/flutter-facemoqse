@@ -54,13 +54,11 @@ class MessageFromTaipc {
       eventId: data['eventId'] ?? '',
       message: data['Message'] ?? '',
       title: data['Title'] ?? '',
-      mosqueid: data['mosqueId'] ?? '',
+      mosqueid: data['mosqueid'] ?? '',
       time: data['time'] ?? '',
       isEvent: data['isEvent'] ?? '',
-    ); 
-    
+    );
   }
-
 
   factory MessageFromTaipc.fromMap(Map<String, dynamic> map) {
     return MessageFromTaipc(
@@ -77,6 +75,10 @@ class MessageFromTaipc {
 
   @override
   String toString() {
+    return 'MessageFromTaipc(title: $title, message: $message, date: $date, time: $time, maxPerson: $maxPerson, mosqueid: $mosqueid, isEvent: $isEvent, eventId: $eventId)';
+  }
+
+  String toStringRaw() {
     return 'MessageFromTaipc(title: $title, message: $message, date: $date, time: $time, maxPerson: $maxPerson, mosqueid: $mosqueid, isEvent: $isEvent, eventId: $eventId)';
   }
 }

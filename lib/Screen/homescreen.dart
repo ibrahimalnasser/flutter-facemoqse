@@ -1,15 +1,15 @@
-import 'dart:convert';
+//TODO: #3 cleaning the code from unused libs and imports @ibrahimalnasser
+//TODO: #4 adding a message for the user to take out the app from the battery optimization @ibrahimalnasser
+//todo: #6 rebuild this code with IOS with the necessary modifcations for android and IOS in such a way that the code works for both @ibrahimalnasser
 
-import 'package:carousel_slider/carousel_slider.dart';
 import 'package:facemosque/Screen/adminControlScreen.dart';
 import 'package:facemosque/Screen/authscreen.dart';
+import 'package:facemosque/Screen/contactUs.dart';
 import 'package:facemosque/Screen/musqScreen.dart';
 import 'package:facemosque/providers/auth.dart';
 import 'package:facemosque/providers/fatchdata.dart';
 import 'package:facemosque/providers/mosque.dart';
 import 'package:facemosque/widget/countdowntimer.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -18,13 +18,13 @@ import 'package:facemosque/Screen/settingsscreen.dart';
 import 'package:facemosque/providers/buttonclick.dart';
 import 'package:facemosque/widget/bottomnav.dart';
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:swipe/swipe.dart';
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import "package:persistent_bottom_nav_bar/persistent_tab_view.dart";
 
 //import "package:persistent_bottom_nav_bar_example_project/custom-widget-tabs.widget.dart";
 //import "package:persistent_bottom_nav_bar_example_project/screens.dart";
-import '../providers/messagefromtaipc.dart';
+import '../main.dart';
 import '../widget/notificationHelper.dart';
 
 class MySlider {
@@ -39,6 +39,7 @@ class MySlider {
       required this.Issharouq});
 }
 
+//todo: #9 adding the information about the mosque as in the website such services and followers and add it in the main interface @ibrahimalnasser
 class HomeScreen extends StatefulWidget {
   static const routeName = '/Home';
 
@@ -49,12 +50,12 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  NotificationHelper _notificationHelper = NotificationHelper();
+  final NotificationHelper _notificationHelper = NotificationHelper();
   //late PersistentTabController _controller;
   //late bool _hideNavBar;
   @override
   void initState() {
-    read();
+    //read();
     super.initState();
     // ignore: unused_local_variable
     PersistentTabController _controller = PersistentTabController();
@@ -67,35 +68,16 @@ class _HomeScreenState extends State<HomeScreen> {
     super.dispose();
   }
 
-  void read() async {
-    FirebaseMessaging.instance.getToken();
-
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
-      SharedPreferences preferences = await SharedPreferences.getInstance();
-      List<MessageFromTaipc> list = [];
-      if (preferences.containsKey('listmessage')) {
-        final List<dynamic> jsonData =
-            jsonDecode(preferences.getString('listmessage')!);
-        list = jsonData.map<MessageFromTaipc>((jsonList) {
-          return MessageFromTaipc.fromJson(jsonList);
-        }).toList();
-      }
-      MessageFromTaipc messagetaipc = MessageFromTaipc.fromJson(message.data);
-      print(messagetaipc.toString());
-      list.add(messagetaipc);
-      preferences.setString('listmessage', MessageFromTaipc.encode(list));
-      await Firebase.initializeApp();
-      _notificationHelper.showNot(messagetaipc);
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     //ask for locationPermission in homeScreen
-    Provider.of<FatchData>(context, listen: false).locationPermission();
+    //Provider.of<FatchData>(context, listen: false).locationPermission();
     //call mosque form provider (FatchData) if not select mosque it well show Noting in All Text
     Mosque mosque = Provider.of<FatchData>(context).mosque;
+
     String mosquefollow = Provider.of<FatchData>(context).mosqueFollow.name;
+    String msoqueFollowEmail =
+        Provider.of<FatchData>(context).mosqueFollow.Email;
 
     //call Map(languagepro) from provider (Buttonclickp) return en language as default
     //have all key of word we need
@@ -135,6 +117,10 @@ class _HomeScreenState extends State<HomeScreen> {
           timeend: mosque.ishai,
           adan: language['isha'],
           Issharouq: false),
+      MySlider(
+          time: mosque.friday_1, timeend: "00:00", adan: "1", Issharouq: false),
+      MySlider(
+          time: mosque.friday_2, timeend: "00:00", adan: "2", Issharouq: false),
     ];
 
     return Scaffold(
@@ -147,9 +133,9 @@ class _HomeScreenState extends State<HomeScreen> {
             if (Provider.of<Buttonclickp>(context, listen: false)
                     .indexnavigationbottmbar !=
                 1) {
-              if (Provider.of<Auth>(context, listen: false).user == null)
+              if (Provider.of<Auth>(context, listen: false).user == null) {
                 Navigator.of(context).pushNamed(AuthScreen.routeName);
-              else {
+              } else {
                 Navigator.of(context).pushNamed(AdminControlScreen.routeName);
               }
             }
@@ -157,13 +143,14 @@ class _HomeScreenState extends State<HomeScreen> {
           child: SafeArea(
             child: Container(
               // background color(white) of app
-              color: Color.fromARGB(255, 255, 255, 255),
+              color: const Color.fromARGB(255, 255, 255, 255),
+
               child: ListView(
                 physics: Provider.of<Buttonclickp>(context)
                             .indexnavigationbottmbar ==
                         1
-                    ? NeverScrollableScrollPhysics()
-                    : AlwaysScrollableScrollPhysics(),
+                    ? const NeverScrollableScrollPhysics()
+                    : const AlwaysScrollableScrollPhysics(),
                 shrinkWrap: true,
                 children: [
                   //if user select Home icon in app index(0) it's well show HomeScrean
@@ -178,7 +165,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 height: 100,
                                 margin: const EdgeInsets.only(top: 10),
                                 decoration: BoxDecoration(
-                                  image: DecorationImage(
+                                  image: const DecorationImage(
                                       image: AssetImage(
                                           "assets/images/quranbackground.jpg"),
                                       fit: BoxFit.cover,
@@ -188,15 +175,16 @@ class _HomeScreenState extends State<HomeScreen> {
                                   borderRadius: BorderRadius.circular(20),
                                   color: Theme.of(context).primaryColor,
                                 ),
-                                padding: EdgeInsets.all(8),
+                                padding: const EdgeInsets.all(8),
                                 child: Center(
                                   child: AutoSizeText(
                                     //show word in en or ar as lebal
-                                    language['titlenamemasjed'] +
+                                    mosquefollow +
                                         "\n" +
-                                        mosquefollow,
+                                        language['Date'] +
+                                        mosque.dataid,
 
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                         color: Colors.white,
                                         fontFamily: "Al-Jazeera",
                                         fontWeight: FontWeight.bold,
@@ -207,118 +195,629 @@ class _HomeScreenState extends State<HomeScreen> {
                                 )),
 
                             //show name of mosque user select if not select it well show nothing
-
-                            CarouselSlider(
-                                options: CarouselOptions(
-                                  //take 28% of height size phone for this widget (cart)
-                                  height: sizedphone.height * 0.23,
-                                  scrollDirection: Axis.horizontal,
-                                  //to keep scroll forever
-                                  enableInfiniteScroll: true,
-                                  autoPlay: true,
-                                  viewportFraction: 1,
-                                  disableCenter: false,
+                            Container(
+                              height: sizedphone.height * 0.65,
+                              width: sizedphone.width * 0.95,
+                              margin: const EdgeInsets.symmetric(vertical: 8),
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: Theme.of(context).primaryColor,
+                                image: const DecorationImage(
+                                    image: AssetImage(
+                                        "assets/images/backgroundprayers.png"),
+                                    fit: BoxFit.cover,
+                                    opacity: 0.1),
+                                border: Border.all(
+                                    color: const Color(0xffD1B000), width: 2),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceAround,
+                                    children: [
+                                      //show word adan or اذان as lebal
+                                      AutoSizeText(
+                                          slider[0].Issharouq
+                                              ? ""
+                                              : language['adan'],
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .displayLarge),
+                                      const SizedBox(),
+                                      AutoSizeText(
+                                          slider[0].Issharouq
+                                              ? ""
+                                              : language['prayer'],
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .displayLarge),
+                                    ],
+                                  ),
+                                  Container(
+                                    height: sizedphone.height * 0.07,
+                                    width: sizedphone.width * 0.90,
+                                    margin:
+                                        const EdgeInsets.symmetric(vertical: 8),
+                                    padding: const EdgeInsets.all(8),
+                                    decoration: BoxDecoration(
+                                      color: Theme.of(context).primaryColor,
+                                      image: const DecorationImage(
+                                          image: AssetImage(
+                                              "assets/images/quranbackground.jpg"),
+                                          fit: BoxFit.cover,
+                                          opacity: 0.1),
+                                      border: Border.all(
+                                          color: const Color(0xffD1B000),
+                                          width: 2),
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceAround,
+                                      children: [
+                                        AutoSizeText(slider[0].time,
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .displayLarge),
+                                        SizedBox(
+                                            height: 32,
+                                            width: 32,
+                                            child: IconButton(
+                                                iconSize: 32,
+                                                alignment: Alignment.topCenter,
+                                                padding:
+                                                    const EdgeInsets.all(0),
+                                                onPressed: () {
+                                                  setState(() {
+                                                    Provider.of<Buttonclickp>(
+                                                            context,
+                                                            listen: false)
+                                                        .sala[0] = !Provider.of<
+                                                                Buttonclickp>(
+                                                            context,
+                                                            listen: false)
+                                                        .sala[0];
+                                                    Provider.of<Buttonclickp>(
+                                                            context,
+                                                            listen: false)
+                                                        .storesalaDay();
+                                                    if (!Provider.of<
+                                                                Buttonclickp>(
+                                                            context,
+                                                            listen: false)
+                                                        .sala[0]) {
+                                                      _notificationHelper
+                                                          .cancel(0);
+                                                    } else {
+                                                      _notificationHelper
+                                                          .initializeNotification();
+                                                      alarmadan('fajer');
+                                                    }
+                                                  });
+                                                },
+                                                icon: Provider.of<Buttonclickp>(
+                                                            context)
+                                                        .sala[0]
+                                                    ? const Icon(
+                                                        FluentIcons
+                                                            .speaker_2_32_filled,
+                                                        size: 32,
+                                                        color: Color.fromARGB(
+                                                            255, 230, 230, 233),
+                                                      )
+                                                    : const Icon(
+                                                        FluentIcons
+                                                            .speaker_off_48_filled,
+                                                        size: 32,
+                                                        color: Color.fromARGB(
+                                                            255, 175, 187, 4),
+                                                      ))),
+                                        AutoSizeText(slider[0].adan,
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .displayLarge),
+                                        AutoSizeText(slider[0].timeend,
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .displayLarge),
+                                      ],
+                                    ),
+                                  ),
+                                  Container(
+                                    height: sizedphone.height * 0.07,
+                                    width: sizedphone.width * 0.90,
+                                    margin:
+                                        const EdgeInsets.symmetric(vertical: 8),
+                                    padding: const EdgeInsets.all(8),
+                                    decoration: BoxDecoration(
+                                      color: Theme.of(context).primaryColor,
+                                      image: const DecorationImage(
+                                          image: AssetImage(
+                                              "assets/images/quranbackground.jpg"),
+                                          fit: BoxFit.cover,
+                                          opacity: 0.1),
+                                      border: Border.all(
+                                          color: const Color(0xffD1B000),
+                                          width: 2),
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceAround,
+                                      children: [
+                                        AutoSizeText(
+                                            slider[1]
+                                                .time
+                                                .replaceAll(RegExp(r"\s+"), ""),
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .displayLarge),
+                                        const SizedBox(
+                                          width: 0,
+                                          height: 0,
+                                        ),
+                                        AutoSizeText(slider[1].adan,
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .displayLarge),
+                                        AutoSizeText(slider[1].timeend,
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .displayLarge),
+                                      ],
+                                    ),
+                                  ),
+                                  Container(
+                                    height: sizedphone.height * 0.07,
+                                    width: sizedphone.width * 0.90,
+                                    margin:
+                                        const EdgeInsets.symmetric(vertical: 8),
+                                    padding: const EdgeInsets.all(8),
+                                    decoration: BoxDecoration(
+                                      color: Theme.of(context).primaryColor,
+                                      image: const DecorationImage(
+                                          image: AssetImage(
+                                              "assets/images/quranbackground.jpg"),
+                                          fit: BoxFit.cover,
+                                          opacity: 0.1),
+                                      border: Border.all(
+                                          color: const Color(0xffD1B000),
+                                          width: 2),
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceAround,
+                                      children: [
+                                        AutoSizeText(slider[2].time,
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .displayLarge),
+                                        SizedBox(
+                                            height: 32,
+                                            width: 32,
+                                            child: IconButton(
+                                                iconSize: 32,
+                                                alignment: Alignment.topCenter,
+                                                padding:
+                                                    const EdgeInsets.all(0),
+                                                onPressed: () {
+                                                  setState(() {
+                                                    Provider.of<Buttonclickp>(
+                                                            context,
+                                                            listen: false)
+                                                        .sala[1] = !Provider.of<
+                                                                Buttonclickp>(
+                                                            context,
+                                                            listen: false)
+                                                        .sala[1];
+                                                    Provider.of<Buttonclickp>(
+                                                            context,
+                                                            listen: false)
+                                                        .storesalaDay();
+                                                    if (!Provider.of<
+                                                                Buttonclickp>(
+                                                            context,
+                                                            listen: false)
+                                                        .sala[1]) {
+                                                      _notificationHelper
+                                                          .cancel(1);
+                                                    } else {
+                                                      _notificationHelper
+                                                          .initializeNotification();
+                                                      alarmadan('dhuhr');
+                                                    }
+                                                  });
+                                                },
+                                                icon: Provider.of<Buttonclickp>(
+                                                            context)
+                                                        .sala[1]
+                                                    ? const Icon(
+                                                        FluentIcons
+                                                            .speaker_2_32_filled,
+                                                        size: 32,
+                                                        color: Color.fromARGB(
+                                                            255, 230, 230, 233),
+                                                      )
+                                                    : const Icon(
+                                                        FluentIcons
+                                                            .speaker_off_48_filled,
+                                                        size: 32,
+                                                        color: Color.fromARGB(
+                                                            255, 175, 187, 4),
+                                                      ))),
+                                        AutoSizeText(slider[2].adan,
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .displayLarge),
+                                        AutoSizeText(slider[2].timeend,
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .displayLarge),
+                                      ],
+                                    ),
+                                  ),
+                                  Container(
+                                    height: sizedphone.height * 0.07,
+                                    width: sizedphone.width * 0.90,
+                                    margin:
+                                        const EdgeInsets.symmetric(vertical: 8),
+                                    padding: const EdgeInsets.all(8),
+                                    decoration: BoxDecoration(
+                                      color: Theme.of(context).primaryColor,
+                                      image: const DecorationImage(
+                                          image: AssetImage(
+                                              "assets/images/quranbackground.jpg"),
+                                          fit: BoxFit.cover,
+                                          opacity: 0.1),
+                                      border: Border.all(
+                                          color: const Color(0xffD1B000),
+                                          width: 2),
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceAround,
+                                      children: [
+                                        AutoSizeText(slider[3].time,
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .displayLarge),
+                                        SizedBox(
+                                            height: 32,
+                                            width: 32,
+                                            child: IconButton(
+                                                iconSize: 32,
+                                                alignment: Alignment.topCenter,
+                                                padding:
+                                                    const EdgeInsets.all(0),
+                                                onPressed: () {
+                                                  setState(() {
+                                                    Provider.of<Buttonclickp>(
+                                                            context,
+                                                            listen: false)
+                                                        .sala[2] = !Provider.of<
+                                                                Buttonclickp>(
+                                                            context,
+                                                            listen: false)
+                                                        .sala[2];
+                                                    Provider.of<Buttonclickp>(
+                                                            context,
+                                                            listen: false)
+                                                        .storesalaDay();
+                                                    if (!Provider.of<
+                                                                Buttonclickp>(
+                                                            context,
+                                                            listen: false)
+                                                        .sala[2]) {
+                                                      _notificationHelper
+                                                          .cancel(2);
+                                                    } else {
+                                                      _notificationHelper
+                                                          .initializeNotification();
+                                                      alarmadan('asr');
+                                                    }
+                                                  });
+                                                },
+                                                icon: Provider.of<Buttonclickp>(
+                                                            context)
+                                                        .sala[2]
+                                                    ? const Icon(
+                                                        FluentIcons
+                                                            .speaker_2_32_filled,
+                                                        size: 32,
+                                                        color: Color.fromARGB(
+                                                            255, 230, 230, 233),
+                                                      )
+                                                    : const Icon(
+                                                        FluentIcons
+                                                            .speaker_off_48_filled,
+                                                        size: 32,
+                                                        color: Color.fromARGB(
+                                                            255, 175, 187, 4),
+                                                      ))),
+                                        AutoSizeText(slider[3].adan,
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .displayLarge),
+                                        AutoSizeText(slider[3].timeend,
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .displayLarge),
+                                      ],
+                                    ),
+                                  ),
+                                  Container(
+                                    height: sizedphone.height * 0.07,
+                                    width: sizedphone.width * 0.90,
+                                    margin:
+                                        const EdgeInsets.symmetric(vertical: 8),
+                                    padding: const EdgeInsets.all(8),
+                                    decoration: BoxDecoration(
+                                      color: Theme.of(context).primaryColor,
+                                      image: const DecorationImage(
+                                          image: AssetImage(
+                                              "assets/images/quranbackground.jpg"),
+                                          fit: BoxFit.cover,
+                                          opacity: 0.1),
+                                      border: Border.all(
+                                          color: const Color(0xffD1B000),
+                                          width: 2),
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceAround,
+                                      children: [
+                                        AutoSizeText(slider[4].time,
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .displayLarge),
+                                        SizedBox(
+                                            height: 32,
+                                            width: 32,
+                                            child: IconButton(
+                                                iconSize: 32,
+                                                alignment: Alignment.topCenter,
+                                                padding:
+                                                    const EdgeInsets.all(0),
+                                                onPressed: () {
+                                                  setState(() {
+                                                    Provider.of<Buttonclickp>(
+                                                            context,
+                                                            listen: false)
+                                                        .sala[3] = !Provider.of<
+                                                                Buttonclickp>(
+                                                            context,
+                                                            listen: false)
+                                                        .sala[3];
+                                                    Provider.of<Buttonclickp>(
+                                                            context,
+                                                            listen: false)
+                                                        .storesalaDay();
+                                                    if (!Provider.of<
+                                                                Buttonclickp>(
+                                                            context,
+                                                            listen: false)
+                                                        .sala[3]) {
+                                                      _notificationHelper
+                                                          .cancel(3);
+                                                    } else {
+                                                      _notificationHelper
+                                                          .initializeNotification();
+                                                      alarmadan('magrib');
+                                                    }
+                                                  });
+                                                },
+                                                icon: Provider.of<Buttonclickp>(
+                                                            context)
+                                                        .sala[3]
+                                                    ? const Icon(
+                                                        FluentIcons
+                                                            .speaker_2_32_filled,
+                                                        size: 32,
+                                                        color: Color.fromARGB(
+                                                            255, 230, 230, 233),
+                                                      )
+                                                    : const Icon(
+                                                        FluentIcons
+                                                            .speaker_off_48_filled,
+                                                        size: 32,
+                                                        color: Color.fromARGB(
+                                                            255, 175, 187, 4),
+                                                      ))),
+                                        AutoSizeText(slider[4].adan,
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .displayLarge),
+                                        AutoSizeText(slider[4].timeend,
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .displayLarge),
+                                      ],
+                                    ),
+                                  ),
+                                  Container(
+                                    height: sizedphone.height * 0.07,
+                                    width: sizedphone.width * 0.90,
+                                    margin:
+                                        const EdgeInsets.symmetric(vertical: 8),
+                                    padding: const EdgeInsets.all(8),
+                                    decoration: BoxDecoration(
+                                      color: Theme.of(context).primaryColor,
+                                      image: const DecorationImage(
+                                          image: AssetImage(
+                                              "assets/images/quranbackground.jpg"),
+                                          fit: BoxFit.cover,
+                                          opacity: 0.1),
+                                      border: Border.all(
+                                          color: const Color(0xffD1B000),
+                                          width: 2),
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceAround,
+                                      children: [
+                                        AutoSizeText(slider[5].time,
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .displayLarge),
+                                        SizedBox(
+                                            height: 32,
+                                            width: 32,
+                                            child: IconButton(
+                                                iconSize: 32,
+                                                alignment: Alignment.topCenter,
+                                                padding:
+                                                    const EdgeInsets.all(0),
+                                                onPressed: () {
+                                                  setState(() {
+                                                    Provider.of<Buttonclickp>(
+                                                            context,
+                                                            listen: false)
+                                                        .sala[4] = !Provider.of<
+                                                                Buttonclickp>(
+                                                            context,
+                                                            listen: false)
+                                                        .sala[4];
+                                                    Provider.of<Buttonclickp>(
+                                                            context,
+                                                            listen: false)
+                                                        .storesalaDay();
+                                                    if (!Provider.of<
+                                                                Buttonclickp>(
+                                                            context,
+                                                            listen: false)
+                                                        .sala[4]) {
+                                                      _notificationHelper
+                                                          .cancel(4);
+                                                    } else {
+                                                      _notificationHelper
+                                                          .initializeNotification();
+                                                      alarmadan('isha');
+                                                    }
+                                                  });
+                                                },
+                                                icon: Provider.of<Buttonclickp>(
+                                                            context)
+                                                        .sala[4]
+                                                    ? const Icon(
+                                                        FluentIcons
+                                                            .speaker_2_32_filled,
+                                                        size: 32,
+                                                        color: Color.fromARGB(
+                                                            255, 230, 230, 233),
+                                                      )
+                                                    : const Icon(
+                                                        FluentIcons
+                                                            .speaker_off_48_filled,
+                                                        size: 32,
+                                                        color: Color.fromARGB(
+                                                            255, 175, 187, 4),
+                                                      ))),
+                                        AutoSizeText(slider[5].adan,
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .displayLarge),
+                                        AutoSizeText(slider[5].timeend,
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .displayLarge),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            /*Container(
+                                height: sizedphone.height * 0.30,
+                                width: sizedphone.width * 0.95,
+                                margin: const EdgeInsets.symmetric(vertical: 4),
+                                decoration: BoxDecoration(
+                                  image: const DecorationImage(
+                                      image: AssetImage(
+                                          "assets/images/quranbackground.jpg"),
+                                      fit: BoxFit.cover,
+                                      opacity: 0.05),
+                                  border: Border.all(
+                                      color: const Color(0xffD1B000), width: 2),
+                                  borderRadius: BorderRadius.circular(20),
+                                  color: Theme.of(context).primaryColor,
                                 ),
-                                // get list of slider to map it well show count of item i have added to list
-                                // with each item I can Show name of adan and time
-                                items: slider
-                                    .map(
-                                      (item) => Container(
-                                          //take 28% of height size phone for this widget
-                                          height: sizedphone.height * 0.15,
-                                          //take 90% of height size phone for this widget
-                                          width: sizedphone.width * 0.95,
-                                          //leave space 8 form left and right  of widget
-                                          margin: const EdgeInsets.symmetric(
-                                              vertical: 8),
-                                          padding: const EdgeInsets.all(8),
-                                          decoration: BoxDecoration(
-                                            color:
-                                                Theme.of(context).primaryColor,
-                                            image: DecorationImage(
-                                                image: AssetImage(
-                                                    "assets/images/backgroundprayers.png"),
-                                                fit: BoxFit.cover,
-                                                opacity: 0.1),
-                                            border: Border.all(
-                                                color: const Color(0xffD1B000),
-                                                width: 2),
-                                            borderRadius:
-                                                BorderRadius.circular(20),
-                                          ),
-                                          child: Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceEvenly,
-                                            children: [
-                                              Text(
-                                                //name of adan
-                                                item.Issharouq
-                                                    ? item.adan +
-                                                        "\n" +
-                                                        item.time
-                                                    : item.adan,
+                                child: Column(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceAround,
+                                    children: [
+                                      // I cearte method for next parer and today aya with seam shape and color and pass text
+                                      titlel(language['Friday']),
+                                      Container(
+                                        height: sizedphone.height * 0.05,
+                                        width: sizedphone.width * 0.90,
+                                        margin: const EdgeInsets.symmetric(
+                                            vertical: 8),
+                                        padding: const EdgeInsets.all(8),
+                                        decoration: BoxDecoration(
+                                          color: Theme.of(context).primaryColor,
+                                          border: Border.all(
+                                              color: const Color(0xffD1B000),
+                                              width: 2),
+                                          borderRadius:
+                                              BorderRadius.circular(20),
+                                        ),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceAround,
+                                          children: [
+                                            AutoSizeText(slider[6].adan,
                                                 style: Theme.of(context)
                                                     .textTheme
-                                                    .displayLarge,
-                                                textAlign: TextAlign.center,
-                                              ),
-                                              const SizedBox(),
-                                              if (!item.Issharouq)
-                                                Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceAround,
-                                                  children: [
-                                                    //show word adan or اذان as lebal
-                                                    Text(
-                                                        item.Issharouq
-                                                            ? ""
-                                                            : language['adan'],
-                                                        style: Theme.of(context)
-                                                            .textTheme
-                                                            .displayLarge),
-                                                    const SizedBox(),
-                                                    Text(
-                                                        item.Issharouq
-                                                            ? ""
-                                                            : language[
-                                                                'prayer'],
-                                                        style: Theme.of(context)
-                                                            .textTheme
-                                                            .displayLarge),
-                                                  ],
-                                                ),
-                                              if (!item.Issharouq)
-                                                Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceAround,
-                                                  children: [
-                                                    //time adan
-                                                    Text(item.time,
-                                                        style: Theme.of(context)
-                                                            .textTheme
-                                                            .displayLarge),
-                                                    SizedBox(
-                                                      width: sizedphone.width *
-                                                          0.095,
-                                                    ),
-                                                    //time المقام
-                                                    Text(item.timeend,
-                                                        style: Theme.of(context)
-                                                            .textTheme
-                                                            .displayLarge),
-                                                  ],
-                                                ),
-                                            ],
-                                          )),
-                                    )
-                                    .toList()),
+                                                    .displayLarge),
+                                            AutoSizeText(slider[6].time,
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .displayLarge),
+                                          ],
+                                        ),
+                                      ),
+                                      Container(
+                                        height: sizedphone.height * 0.05,
+                                        width: sizedphone.width * 0.90,
+                                        margin: const EdgeInsets.symmetric(
+                                            vertical: 8),
+                                        padding: const EdgeInsets.all(8),
+                                        decoration: BoxDecoration(
+                                          color: Theme.of(context).primaryColor,
+                                          border: Border.all(
+                                              color: const Color(0xffD1B000),
+                                              width: 2),
+                                          borderRadius:
+                                              BorderRadius.circular(20),
+                                        ),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceAround,
+                                          children: [
+                                            AutoSizeText(slider[7].adan,
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .displayLarge),
+                                            AutoSizeText(slider[7].time,
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .displayLarge),
+                                          ],
+                                        ),
+                                      ),
+                                    ])),*/
                             Container(
                               height: sizedphone.height * 0.58,
                               width: sizedphone.width * 0.95,
                               decoration: BoxDecoration(
-                                image: DecorationImage(
+                                image: const DecorationImage(
                                     image: AssetImage(
                                         "assets/images/quranbackground.jpg"),
                                     fit: BoxFit.cover,
@@ -345,7 +844,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                       DateTime.now()
                                                           .minute
                                                           .toString()))
-                                          ? CountdownTimer()
+                                          ? const CountdownTimer()
                                           : Text(language['Today\'s prayers are over'],
                                               style: Theme.of(context)
                                                   .textTheme
@@ -357,7 +856,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                               .textTheme
                                               .displayLarge!
                                               .copyWith(fontSize: 15)),
-                                  titlel(language['todayaya']),
+                                  titlel(mosque.horA == 0
+                                      ? language['todayHadith']
+                                      : language['todayaya']),
                                   Expanded(
                                       child: Container(
                                     /*decoration: BoxDecoration(
@@ -418,6 +919,19 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
           ),
+        ),
+        floatingActionButton: Visibility(
+          visible: msoqueFollowEmail.isNotEmpty,
+          child: FloatingActionButton(
+            onPressed: () =>
+                Navigator.of(context).pushNamed(contactUs.routeName),
+
+            // Add your onPressed code here!
+
+            backgroundColor: Colors.white,
+            child: const Icon(Icons.contact_support_sharp,
+                color: Color(0xFF94C973)),
+          ),
         ));
   }
 
@@ -427,10 +941,11 @@ class _HomeScreenState extends State<HomeScreen> {
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
-        color: Color(0xFF94C973),
+        color: const Color(0xFF94C973),
       ),
       alignment: Alignment.center,
-      child: Text(titlel, style: Theme.of(context).textTheme.displayLarge),
+      child:
+          AutoSizeText(titlel, style: Theme.of(context).textTheme.displayLarge),
     );
   }
 }

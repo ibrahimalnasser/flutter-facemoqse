@@ -6,6 +6,8 @@ import 'package:provider/provider.dart';
 import 'package:mapbox_search/mapbox_search.dart';
 
 class LoctionMosque extends StatefulWidget {
+  const LoctionMosque({super.key});
+
   @override
   State<LoctionMosque> createState() => _LoctionMosqueState();
 }
@@ -63,12 +65,9 @@ class _LoctionMosqueState extends State<LoctionMosque> {
 
     return Stack(
       children: [
-        new FlutterMap(
+        FlutterMap(
           mapController: mapController,
-          options: new MapOptions(
-            //  debugMultiFingerGestureWinner: true,
-            //  allowPanningOnScrollingParent: true,
-
+          options: MapOptions(
             //set camera map from l
             center: l,
             zoom: zoom,
@@ -95,7 +94,7 @@ class _LoctionMosqueState extends State<LoctionMosque> {
         Align(
           alignment: Alignment.bottomLeft,
           child: Container(
-              margin: EdgeInsets.all(5),
+              margin: const EdgeInsets.all(5),
               height: sizedphone.height * 0.06,
               width: sizedphone.width * 0.1,
               decoration: BoxDecoration(
@@ -108,12 +107,12 @@ class _LoctionMosqueState extends State<LoctionMosque> {
                     mapController.move(l, zoom);
                     print(zoom);
                   },
-                  icon: Icon(Icons.zoom_out))),
+                  icon: const Icon(Icons.zoom_out))),
         ),
         Align(
           alignment: Alignment.bottomRight,
           child: Container(
-              margin: EdgeInsets.all(5),
+              margin: const EdgeInsets.all(5),
               height: sizedphone.height * 0.06,
               width: sizedphone.width * 0.1,
               decoration: BoxDecoration(
@@ -128,7 +127,7 @@ class _LoctionMosqueState extends State<LoctionMosque> {
                       print(zoom);
                     }
                   },
-                  icon: Icon(Icons.zoom_in))),
+                  icon: const Icon(Icons.zoom_in))),
         ),
       ],
     );

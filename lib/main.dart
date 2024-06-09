@@ -1,11 +1,11 @@
 import 'dart:convert';
-import 'dart:io';
 //import 'firebase_options.dart';
 import 'package:facemosque/Screen/LanguageScreen.dart';
 import 'package:facemosque/Screen/adminControlScreen.dart';
 import 'package:facemosque/Screen/authscreen.dart';
 import 'package:facemosque/Screen/azanScreen.dart';
 import 'package:facemosque/Screen/connectScreen.dart';
+import 'package:facemosque/Screen/contactUs.dart';
 import 'package:facemosque/Screen/createnotificationsScreen.dart';
 import 'package:facemosque/Screen/hijriScreen.dart';
 import 'package:facemosque/Screen/homescreen.dart';
@@ -33,7 +33,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:http/http.dart' as http;
-import 'package:workmanager/workmanager.dart';
+import 'package:background_fetch/background_fetch.dart';
 
 //method set adan for all sala
 Future<void> calladan() async {
@@ -48,7 +48,6 @@ Future<void> calladan() async {
 
 //firebase setting for notification
 Future<void> _firebasePushHandler(RemoteMessage message) async {
-  print(message.data);
   SharedPreferences preferences = await SharedPreferences.getInstance();
   List<MessageFromTaipc> list = [];
   if (preferences.containsKey('listmessage')) {
@@ -58,11 +57,13 @@ Future<void> _firebasePushHandler(RemoteMessage message) async {
       return MessageFromTaipc.fromJson(jsonList);
     }).toList();
   }
+
   MessageFromTaipc messagetaipc = MessageFromTaipc.fromJson(message.data);
+
   list.add(messagetaipc);
   preferences.setString('listmessage', MessageFromTaipc.encode(list));
   await Firebase.initializeApp();
-  _notificationHelper.showNot(messagetaipc);
+  // _notificationHelper.showNot(messagetaipc);
 }
 
 NotificationHelper _notificationHelper = NotificationHelper();
@@ -80,43 +81,85 @@ Future<void> updateMosuqe() async {
         'Accept': 'application/json',
       },
     ).timeout(const Duration(seconds: 300));
-    print(response.body);
-    Mosque mosqu = await Mosque.fromJson(jsonDecode(response.body));
+
+    var data = utf8.decode(response.bodyBytes);
+    Mosque mosqu = Mosque.fromJson(jsonDecode(data));
     preferences.setString('mosque', json.encode(mosqu.toMap()));
   }
 }
 
-void callbackDispatcher() {
-  WidgetsFlutterBinding.ensureInitialized();
-  Workmanager().executeTask((task, inputData) async {
-    TimeOfDay now = TimeOfDay.now();
-    if (now.hour == 23) {
-      await updateMosuqe();
-    }
+void read() async {
+  FirebaseMessaging.instance.getToken();
 
-    return Future.value(true);
+  FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    List<MessageFromTaipc> list = [];
+    if (preferences.containsKey('listmessage')) {
+      final List<dynamic> jsonData =
+          jsonDecode(preferences.getString('listmessage')!);
+      list = jsonData.map<MessageFromTaipc>((jsonList) {
+        return MessageFromTaipc.fromJson(jsonList);
+      }).toList();
+    }
+    MessageFromTaipc messagetaipc = MessageFromTaipc.fromJson(message.data);
+    list.add(messagetaipc);
+    preferences.setString('listmessage', MessageFromTaipc.encode(list));
+    await Firebase.initializeApp();
+    _notificationHelper.showNot(messagetaipc);
   });
 }
 
+// @pragma('vm:entry-point')
+// void callbackDispatcher() {
+//   Workmanager().executeTask((task, inputData) async {
+//     await updateMosuqe();
+//     return Future.value(true);
+//   });
+// }
+
 int? initScreen;
+@pragma('vm:entry-point')
+void backgroundFetchHeadlessTask(HeadlessTask task) async {
+  String taskId = task.taskId;
+  bool isTimeout = task.timeout;
+  if (isTimeout) {
+    await updateMosuqe();
+    BackgroundFetch.finish(taskId);
+    return;
+  }
+  // Do your work here...
+  BackgroundFetch.finish(taskId);
+}
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  if (Platform.isAndroid) {
-    Workmanager().initialize(callbackDispatcher, isInDebugMode: false);
-    await Workmanager().registerPeriodicTask(
-        'recallmousqedata', 'recallmousqedata',
-        frequency: Duration(hours: 1),
-        initialDelay: Duration(seconds: 10),
-        constraints: Constraints(networkType: NetworkType.connected));
-  }
-  //set all alarm when app open
+  BackgroundFetch.scheduleTask(TaskConfig(
+      taskId: "com.transistorsoft.customtask",
+      delay: 7200000 // <-- milliseconds
+      ));
+  await updateMosuqe();
+  // Workmanager().initialize(callbackDispatcher);
+  // await Workmanager().registerPeriodicTask(
+  //     'recallmousqedata', 'recallmousqedata',
+  //     frequency: const Duration(hours: 2),
+  //     initialDelay: const Duration(seconds: 10),
+  //     constraints: Constraints(networkType: NetworkType.connected));
+  //set all alarm when app ope
   calladan();
 
   await Firebase.initializeApp();
-  FirebaseMessaging.onBackgroundMessage(_firebasePushHandler);
+  FirebaseMessaging.instance.getToken();
+
+  await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
+    alert: true, // Required to display a heads up notification
+    badge: true,
+    sound: true,
+  );
+
+  read();
+  //FirebaseMessaging.onBackgroundMessage(_firebasePushHandler);
   SharedPreferences prefs = await SharedPreferences.getInstance();
-  initScreen = await prefs.getInt("initScreen");
+  initScreen = prefs.getInt("initScreen");
   await prefs.setInt("initScreen", 1);
   runApp(const MyApp());
 }
@@ -280,26 +323,27 @@ class _MyAppState extends State<MyApp> {
         ),
         routes: {
           HomeScreen.routeName: (_) => const HomeScreen(),
-          SigninScreenforEvent.routeName: (_) => SigninScreenforEvent(),
-          AdminControlScreen.routeName: (_) => AdminControlScreen(),
+          SigninScreenforEvent.routeName: (_) => const SigninScreenforEvent(),
+          AdminControlScreen.routeName: (_) => const AdminControlScreen(),
           CreatenotificationsScreen.routeName: (_) =>
-              CreatenotificationsScreen(),
-          AuthScreen.routeName: (_) => AuthScreen(),
-          Information.routeName: (_) => Information(),
-          LanguageScreen.routeName: (_) => LanguageScreen(),
-          ThemeScreen.routeName: (_) => ThemeScreen(),
+              const CreatenotificationsScreen(),
+          AuthScreen.routeName: (_) => const AuthScreen(),
+          Information.routeName: (_) => const Information(),
+          LanguageScreen.routeName: (_) => const LanguageScreen(),
+          ThemeScreen.routeName: (_) => const ThemeScreen(),
           AzanScreen.routeName: (_) => AzanScreen(),
-          HigiriScreen.routeName: (_) => HigiriScreen(),
-          ResetScreen.routeName: (_) => ResetScreen(),
-          ScreenScreen.routeName: (_) => ScreenScreen(),
-          VolumeScreen.routeName: (_) => VolumeScreen(),
+          HigiriScreen.routeName: (_) => const HigiriScreen(),
+          ResetScreen.routeName: (_) => const ResetScreen(),
+          ScreenScreen.routeName: (_) => const ScreenScreen(),
+          VolumeScreen.routeName: (_) => const VolumeScreen(),
           MessageScscreen.routeName: (_) => MessageScscreen(),
-          PrayerTimeSreen.routeName: (_) => PrayerTimeSreen(),
-          ConnectScreen.routeName: (_) => ConnectScreen(),
-          OnbordingScreen2.routeName: (_) => OnbordingScreen2()
+          PrayerTimeSreen.routeName: (_) => const PrayerTimeSreen(),
+          ConnectScreen.routeName: (_) => const ConnectScreen(),
+          OnbordingScreen2.routeName: (_) => const OnbordingScreen2(),
+          contactUs.routeName: (_) => const contactUs()
         },
         //when app launch run SplachScreen
-        home: SplachScreen2(),
+        home: const SplachScreen2(),
       ),
     );
   }

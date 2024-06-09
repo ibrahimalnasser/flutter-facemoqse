@@ -23,7 +23,7 @@ class _EventNotificationsState extends State<EventNotifications> {
   Timer? t;
   @override
   void initState() {
-    t = Timer.periodic(Duration(seconds: 1), (timer) {
+    t = Timer.periodic(const Duration(seconds: 1), (timer) {
       Provider.of<MessageSetting>(context, listen: false).getNotification();
     });
     super.initState();
@@ -37,10 +37,10 @@ class _EventNotificationsState extends State<EventNotifications> {
     super.dispose();
   }
 
+// todo: #8 fixing the way to show the notifications, the current method using timer to update @ibrahimalnasser
   @override
   Widget build(BuildContext context) {
     listmessage = Provider.of<MessageSetting>(context).messageFromTaipc;
-    print(listmessage);
 
     //call Map(languagepro) from provider (Buttonclickp) return en language as default
     Map language = Provider.of<Buttonclickp>(context).languagepro;
@@ -64,7 +64,7 @@ class _EventNotificationsState extends State<EventNotifications> {
             style: Theme.of(context).textTheme.displayLarge,
           ),
         ),
-        Container(
+        SizedBox(
           height: sizedphone.height * 0.73,
           width: sizedphone.width * 0.95,
           child: ListView(
@@ -77,7 +77,7 @@ class _EventNotificationsState extends State<EventNotifications> {
                   borderRadius: BorderRadius.circular(20),
                   color: Colors.white,
                 ),
-                child: Container(
+                child: SizedBox(
                   width: sizedphone.width * 0.9,
                   child: Column(children: [
                     ListTile(
@@ -136,21 +136,21 @@ class _EventNotificationsState extends State<EventNotifications> {
                                         },
                                         child: Text(
                                           language['no'],
-                                          style: TextStyle(color: Colors.red),
+                                          style: const TextStyle(color: Colors.red),
                                         ),
                                       ),
                                     ],
                                   ),
                                 );
                               },
-                              icon: Icon(Icons.delete),
+                              icon: const Icon(Icons.delete),
                               label: Text(language['Delete'])),
                           item.isEvent == 'true'
                               ? TextButton.icon(
                                   onPressed: () async {
                                     SharedPreferences prefs =
                                         await SharedPreferences.getInstance();
-                                    if (!prefs.containsKey('${item.eventId}')) {
+                                    if (!prefs.containsKey(item.eventId)) {
                                       showDialog(
                                         context: context,
                                         builder: (ctx) => AlertDialog(
@@ -178,7 +178,7 @@ class _EventNotificationsState extends State<EventNotifications> {
                                               },
                                               child: Text(
                                                 language['no'],
-                                                style: TextStyle(
+                                                style: const TextStyle(
                                                     color: Colors.red),
                                               ),
                                             ),
@@ -193,15 +193,15 @@ class _EventNotificationsState extends State<EventNotifications> {
                                             borderRadius:
                                                 BorderRadius.circular(40),
                                           ),
-                                          title: Text('Qr Code'),
+                                          title: const Text('Qr Code'),
                                           content: Container(
-                                            padding: EdgeInsets.only(left: 10),
+                                            padding: const EdgeInsets.only(left: 10),
                                             alignment: Alignment.center,
                                             height: sizedphone.height * 0.3,
                                             width: sizedphone.width * 0.7,
                                             child: QrImageView(
                                               data: prefs.getString(
-                                                  '${item.eventId}')!,
+                                                  item.eventId)!,
                                               version: QrVersions.auto,
                                               size: 300.0,
                                             ),
@@ -211,7 +211,7 @@ class _EventNotificationsState extends State<EventNotifications> {
                                               padding:
                                                   const EdgeInsets.all(8.0),
                                               child: TextButton.icon(
-                                                icon: Icon(Icons
+                                                icon: const Icon(Icons
                                                     .arrow_forward_ios_sharp),
                                                 onPressed: () async {
                                                   SharedPreferences
@@ -231,8 +231,8 @@ class _EventNotificationsState extends State<EventNotifications> {
                                       );
                                     }
                                   },
-                                  icon: Icon(Icons.qr_code),
-                                  label: Text('Qr'))
+                                  icon: const Icon(Icons.qr_code),
+                                  label: const Text('Qr'))
                               : Container(),
                           TextButton.icon(
                               onPressed: () {
@@ -242,7 +242,7 @@ class _EventNotificationsState extends State<EventNotifications> {
                                     "\n" +
                                     "Facemosuqe Team");
                               },
-                              icon: Icon(Icons.share),
+                              icon: const Icon(Icons.share),
                               label: Text(language['Share'])),
                         ],
                       ),
@@ -257,3 +257,5 @@ class _EventNotificationsState extends State<EventNotifications> {
     );
   }
 }
+
+//ToDo

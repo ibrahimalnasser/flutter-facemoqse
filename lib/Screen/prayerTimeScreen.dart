@@ -12,13 +12,15 @@ import '../providers/buttonclick.dart';
 class PrayerTimeSreen extends StatefulWidget {
   static const routeName = '/preyertime';
 
+  const PrayerTimeSreen({super.key});
+
   @override
   State<PrayerTimeSreen> createState() => _PrayerTimeSreenState();
 }
 
 class _PrayerTimeSreenState extends State<PrayerTimeSreen> {
   String command = '';
-  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   GroupButtonController settingController = GroupButtonController();
   GroupButtonController payerController = GroupButtonController();
 
@@ -33,6 +35,11 @@ class _PrayerTimeSreenState extends State<PrayerTimeSreen> {
 
     return Scaffold(
       key: _scaffoldKey,
+      appBar: AppBar(leading: IconButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  icon:const Icon(Icons.arrow_back_ios)),),
       body: SingleChildScrollView(
         child: Center(
           child: Column(
@@ -153,7 +160,7 @@ class _PrayerTimeSreenState extends State<PrayerTimeSreen> {
                   },
                   style: ButtonStyle(
                       padding: WidgetStateProperty.all<EdgeInsetsGeometry>(
-                          EdgeInsets.all(13)),
+                          const EdgeInsets.all(13)),
                       shape: WidgetStateProperty.all<RoundedRectangleBorder>(
                           RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(18.0),
@@ -185,7 +192,7 @@ class _PrayerTimeSreenState extends State<PrayerTimeSreen> {
                             : '';
         var s = DateFormat("hh:mm").parse(time);
         Duration duration = Duration(minutes: minute);
-        command = "PrayerTime prayer ${prayer} ${_printDuration(duration)}";
+        command = "PrayerTime prayer $prayer ${_printDuration(duration)}";
         //command = "PrayerTime ${language['fajer'] == prayer1 ? _printDuration(duration) : mosque.fajer} ${language['dhuhr'] == prayer1 ? _printDuration(duration) : mosque.dhuhr} ${language['asr'] == prayer1 ? _printDuration(duration) : mosque.asr} ${language['magrib'] == prayer1 ? _printDuration(duration) : mosque.magrib} ${language['isha'] == prayer1 ? _printDuration(duration) : mosque.isha}  ${mosque.fajeri}  ${mosque.dhuhri}   ${mosque.asri}  ${mosque.magribi}  ${mosque.ishai}";
         print(mosque.fajer);
         print(command);
@@ -207,7 +214,7 @@ class _PrayerTimeSreenState extends State<PrayerTimeSreen> {
         var s = DateFormat("hh:mm").parse(time);
         // Duration duration = Duration(hours: s.hour, minutes: s.minute + minute);
         Duration duration = Duration(minutes: minute);
-        command = "PrayerTime iqamah ${prayer} ${_printDuration(duration)}";
+        command = "PrayerTime iqamah $prayer ${_printDuration(duration)}";
         //command ="PrayerTime  ${mosque.fajer} ${mosque.dhuhr} ${mosque.asr} ${mosque.magrib} ${mosque.isha}  ${language['fajer'] == prayer1 ? _printDuration(duration) : mosque.fajeri}  ${language['dhuhr'] == prayer1 ? _printDuration(duration) : mosque.dhuhri}   ${language['asr'] == prayer1 ? _printDuration(duration) : mosque.asri}  ${language['magrib'] == prayer1 ? _printDuration(duration) : mosque.magribi}  ${language['isha'] == prayer1 ? _printDuration(duration) : mosque.ishai}";
 
         print(mosque.fajeri);
@@ -233,7 +240,7 @@ class _PrayerTimeSreenState extends State<PrayerTimeSreen> {
   String _printDuration(Duration duration) {
     String twoDigits(int n) => n.toString().padLeft(2, "0");
     String twoDigitMinutes = twoDigits(duration.inMinutes.remainder(60));
-    return "$twoDigitMinutes";
+    return twoDigitMinutes;
   }
 
   Container titlel(String titlel, int i, Size s) {
@@ -248,7 +255,7 @@ class _PrayerTimeSreenState extends State<PrayerTimeSreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          SizedBox(),
+          const SizedBox(),
           Text(titlel, style: Theme.of(context).textTheme.displayLarge),
           Container(
               height: s.height * 0.06,

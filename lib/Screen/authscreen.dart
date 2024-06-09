@@ -8,6 +8,8 @@ import '../providers/buttonclick.dart';
 
 class AuthScreen extends StatelessWidget {
   static const routeName = '/auth';
+
+  const AuthScreen({super.key});
   @override
   Widget build(BuildContext context) {
     final deciceSize = MediaQuery.of(context).size;
@@ -18,7 +20,7 @@ class AuthScreen extends StatelessWidget {
           SingleChildScrollView(
             child: Container(
               decoration:
-                  BoxDecoration(boxShadow: [BoxShadow(color: Colors.white12)]),
+                  const BoxDecoration(boxShadow: [BoxShadow(color: Colors.white12)]),
               height: deciceSize.height,
               width: deciceSize.width,
               child: Column(
@@ -35,7 +37,7 @@ class AuthScreen extends StatelessWidget {
                     width: deciceSize.width * 0.9,
                   )),
                   Flexible(
-                    child: AuthCard(),
+                    child: const AuthCard(),
                     flex: deciceSize.width > 600 ? 2 : 6,
                   )
                 ],
@@ -43,7 +45,7 @@ class AuthScreen extends StatelessWidget {
             ),
           ),
           Container(
-            margin: EdgeInsets.symmetric(horizontal: 5, vertical: 30),
+            margin: const EdgeInsets.symmetric(horizontal: 5, vertical: 30),
             alignment: Alignment.topLeft,
             child: IconButton(
               icon: const Icon(Icons.arrow_back_ios_new),
@@ -59,6 +61,8 @@ class AuthScreen extends StatelessWidget {
 }
 
 class AuthCard extends StatefulWidget {
+  const AuthCard({super.key});
+
   @override
   State<AuthCard> createState() => _AuthCardState();
 }
@@ -69,7 +73,7 @@ class _AuthCardState extends State<AuthCard>
     with SingleTickerProviderStateMixin {
   AuthMode _authMode = AuthMode.Login;
 
-  var _isLoading = false;
+  final _isLoading = false;
   final _passwordController = TextEditingController();
   final _usernameController = TextEditingController();
   final _emailController = TextEditingController();
@@ -85,14 +89,14 @@ class _AuthCardState extends State<AuthCard>
   void initState() {
     super.initState();
     Provider.of<Auth>(context, listen: false).readuser();
-    _usernameController.text = 'mbd';
-    _passwordController.text = '123456';
+    _usernameController.text = '';
+    _passwordController.text = '';
     // getDeviceName();
     _controller =
-        AnimationController(vsync: this, duration: Duration(milliseconds: 300));
+        AnimationController(vsync: this, duration: const Duration(milliseconds: 300));
     _slideAnimation = Tween<Offset>(
-      begin: Offset(0, -0.15),
-      end: Offset(0, 0),
+      begin: const Offset(0, -0.15),
+      end: const Offset(0, 0),
     ).animate(CurvedAnimation(
       parent: _controller,
       curve: Curves.fastOutSlowIn,
@@ -193,7 +197,7 @@ class _AuthCardState extends State<AuthCard>
               : deciceSize.height * 0.5,
         ),
         width: deciceSize.width * 0.9,
-        padding: EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16),
         child: SingleChildScrollView(
           child: Column(
             children: [
@@ -212,7 +216,7 @@ class _AuthCardState extends State<AuthCard>
               ),
               AnimatedContainer(
                 curve: Curves.easeIn,
-                duration: Duration(milliseconds: 300),
+                duration: const Duration(milliseconds: 300),
                 constraints: BoxConstraints(
                   minHeight: _authMode == AuthMode.SignUp ? 25 : 0,
                   maxHeight: _authMode == AuthMode.SignUp ? 80 : 0,
@@ -239,7 +243,7 @@ class _AuthCardState extends State<AuthCard>
               ),
               AnimatedContainer(
                 curve: Curves.easeIn,
-                duration: Duration(milliseconds: 300),
+                duration: const Duration(milliseconds: 300),
                 constraints: BoxConstraints(
                   minHeight: _authMode == AuthMode.SignUp ? 25 : 0,
                   maxHeight: _authMode == AuthMode.SignUp ? 50 : 0,
@@ -269,14 +273,15 @@ class _AuthCardState extends State<AuthCard>
                 obscureText: true,
                 controller: _passwordController,
                 validator: (val) {
-                  if (val!.isEmpty || val.length < 5)
+                  if (val!.isEmpty || val.length < 5) {
                     return language['passowrdisshort'];
+                  }
                   return null;
                 },
               ),
               AnimatedContainer(
                 curve: Curves.easeIn,
-                duration: Duration(milliseconds: 300),
+                duration: const Duration(milliseconds: 300),
                 constraints: BoxConstraints(
                   minHeight: _authMode == AuthMode.SignUp ? 25 : 0,
                   maxHeight: _authMode == AuthMode.SignUp ? 50 : 0,
@@ -292,8 +297,9 @@ class _AuthCardState extends State<AuthCard>
                       obscureText: true,
                       validator: _authMode == AuthMode.SignUp
                           ? (val) {
-                              if (val != _passwordController.text)
+                              if (val != _passwordController.text) {
                                 return language['Password do not match!'];
+                              }
                               return null;
                             }
                           : null,
@@ -303,7 +309,7 @@ class _AuthCardState extends State<AuthCard>
               ),
               AnimatedContainer(
                 curve: Curves.easeIn,
-                duration: Duration(milliseconds: 300),
+                duration: const Duration(milliseconds: 300),
                 constraints: BoxConstraints(
                   minHeight: _authMode == AuthMode.SignUp ? 25 : 0,
                   maxHeight: _authMode == AuthMode.SignUp ? 50 : 0,
@@ -343,7 +349,7 @@ class _AuthCardState extends State<AuthCard>
               ),
               AnimatedContainer(
                 curve: Curves.easeIn,
-                duration: Duration(milliseconds: 300),
+                duration: const Duration(milliseconds: 300),
                 constraints: BoxConstraints(
                   minHeight: _authMode == AuthMode.SignUp ? 25 : 0,
                   maxHeight: _authMode == AuthMode.SignUp ? 50 : 0,
@@ -359,8 +365,9 @@ class _AuthCardState extends State<AuthCard>
                       controller: _emailController,
                       keyboardType: TextInputType.emailAddress,
                       validator: (val) {
-                        if (val!.isEmpty || !val.contains('@'))
+                        if (val!.isEmpty || !val.contains('@')) {
                           return language['Invalid Email'];
+                        }
                         return null;
                       },
                     ),
@@ -369,7 +376,7 @@ class _AuthCardState extends State<AuthCard>
               ),
               AnimatedContainer(
                 curve: Curves.easeIn,
-                duration: Duration(milliseconds: 300),
+                duration: const Duration(milliseconds: 300),
                 constraints: BoxConstraints(
                   minHeight: _authMode == AuthMode.SignUp ? 25 : 0,
                   maxHeight: _authMode == AuthMode.SignUp ? 50 : 0,
@@ -393,31 +400,38 @@ class _AuthCardState extends State<AuthCard>
                   ),
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 20,
               ),
-              if (_isLoading) CircularProgressIndicator(),
-              MaterialButton(
+              if (_isLoading) const CircularProgressIndicator(),
+              ElevatedButton(
                 child: Text(_authMode == AuthMode.Login
                     ? language['LOGIN']
                     : language['SIGNUP']),
                 onPressed: _authMode == AuthMode.Login ? submit : register,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30)),
-                padding: EdgeInsets.symmetric(horizontal: 30, vertical: 8),
-                color: Theme.of(context).primaryColor,
-                textColor: Colors.white,
+                style: ElevatedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30)),
+                    padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 8),
+                    shadowColor: Theme.of(context).primaryColor,
+                    textStyle: const TextStyle(
+                      color: Colors.white,
+                    )),
               ),
-              MaterialButton(
+              TextButton(
                 onPressed: _switchAuthMode,
                 child: Text(
                   _authMode == AuthMode.Login
                       ? language['SIGNUP']
                       : language['LOGIN'],
                 ),
-                padding: EdgeInsets.symmetric(horizontal: 30, vertical: 4),
-                //color: Theme.of(context).primaryColor,
-                textColor: Theme.of(context).primaryColor,
+                style: ElevatedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30)),
+                    padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 8),
+                    textStyle: TextStyle(
+                      color: Theme.of(context).primaryColor,
+                    )),
               ),
             ],
           ),
@@ -435,7 +449,7 @@ class _AuthCardState extends State<AuthCard>
               title: Center(child: Text(language['An Error Occurred'])),
               content: Text(errorMessage.toString()),
               actions: [
-                MaterialButton(
+                TextButton(
                   onPressed: () => Navigator.of(ctx).pop(),
                   child: Text(language['OK']),
                 )

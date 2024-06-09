@@ -8,7 +8,9 @@ import '../providers/buttonclick.dart';
 // ignore: must_be_immutable
 class AzanScreen extends StatelessWidget {
   static const routeName = '/azan';
-  GroupButtonController _controller = GroupButtonController();
+  final GroupButtonController _controller = GroupButtonController();
+
+  AzanScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -16,6 +18,11 @@ class AzanScreen extends StatelessWidget {
     var sizedphone = MediaQuery.of(context).size;
     Map language = Provider.of<Buttonclickp>(context).languagepro;
     return Scaffold(
+      appBar: AppBar(leading: IconButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  icon:const Icon(Icons.arrow_back_ios)),),
       body: SingleChildScrollView(
         child: Center(
           child: Column(
@@ -38,10 +45,11 @@ class AzanScreen extends StatelessWidget {
                   options: GroupButtonOptions(
                       borderRadius: BorderRadius.circular(25)),
                   onSelected: (index, isSelected, t) {
-                    if (adan[isSelected] == true)
+                    if (adan[isSelected] == true) {
                       adan[isSelected] = false;
-                    else
+                    } else {
                       adan[isSelected] = true;
+                    }
 
                     print('$index button is selected');
                   },
@@ -62,7 +70,7 @@ class AzanScreen extends StatelessWidget {
                   },
                   style: ButtonStyle(
                       padding: WidgetStateProperty.all<EdgeInsetsGeometry>(
-                          EdgeInsets.all(13)),
+                          const EdgeInsets.all(13)),
                       shape: WidgetStateProperty.all<RoundedRectangleBorder>(
                           RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(18.0),

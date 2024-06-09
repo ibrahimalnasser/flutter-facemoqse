@@ -14,6 +14,8 @@ class Themea {
 class ThemeScreen extends StatelessWidget {
   static const routeName = '/theme';
 
+  const ThemeScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     Map language = Provider.of<Buttonclickp>(context).languagepro;
@@ -26,6 +28,11 @@ class ThemeScreen extends StatelessWidget {
     var sizedphone = MediaQuery.of(context).size;
 
     return Scaffold(
+      appBar: AppBar(leading: IconButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  icon:const Icon(Icons.arrow_back_ios)),),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Center(
@@ -96,7 +103,7 @@ class ThemeScreen extends StatelessWidget {
                     },
                     style: ButtonStyle(
                         padding: WidgetStateProperty.all<EdgeInsetsGeometry>(
-                            EdgeInsets.all(13)),
+                            const EdgeInsets.all(13)),
                         shape:
                             WidgetStateProperty.all<RoundedRectangleBorder>(
                                 RoundedRectangleBorder(

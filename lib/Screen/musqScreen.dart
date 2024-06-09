@@ -23,7 +23,7 @@ class MusqScreen extends StatefulWidget {
 }
 
 class _MusqScreenState extends State<MusqScreen> with TickerProviderStateMixin {
-  NotificationHelper _notificationHelper = NotificationHelper();
+  final NotificationHelper _notificationHelper = NotificationHelper();
 
   late Mosques mosquesforevent;
   late Mosques mosquefollow;
@@ -145,6 +145,8 @@ class _MusqScreenState extends State<MusqScreen> with TickerProviderStateMixin {
                                     Provider.of<FatchData>(context,
                                             listen: false)
                                         .setmosqueFollowFavrote(false);
+
+                                    unsubscribeTopic(mosquefollow.name);
                                     // store bool replacetoloc in SharedPreferences
                                     // when user select mosuqe and close app
                                     //it save what well show to user (All mousqe)
@@ -201,7 +203,7 @@ class _MusqScreenState extends State<MusqScreen> with TickerProviderStateMixin {
                           ),
                           Container(
                               alignment: Alignment.center,
-                              margin: EdgeInsets.symmetric(vertical: 10),
+                              margin: const EdgeInsets.symmetric(vertical: 10),
                               decoration: BoxDecoration(
                                 //  borderRadius: BorderRadius.circular(30),
                                 border: Border.all(
@@ -210,7 +212,7 @@ class _MusqScreenState extends State<MusqScreen> with TickerProviderStateMixin {
                               height: sizedphone.height * 0.62,
                               width: sizedphone.width * 0.9,
                               //class show Map and Laction mosuqe
-                              child: LoctionMosque()),
+                              child: const LoctionMosque()),
                         ],
                       )
                 //if indextab==1 (Other Mosuqe) it well show Screan MyMosuqe
@@ -260,10 +262,11 @@ class _MusqScreenState extends State<MusqScreen> with TickerProviderStateMixin {
                                     .storereplacetoevent(true);
                                 Provider.of<FatchData>(context, listen: false)
                                     .fatchandsetallmosque();
+
                                 unsubscribeTopic(mosquesforevent.name);
                               },
-                              icon: Icon(Icons.star,
-                                  color: const Color(0xFFd4af37))),
+                              icon: const Icon(Icons.star,
+                                  color: Color(0xFFd4af37))),
                         ),
                       ),
           ],
@@ -326,7 +329,7 @@ class _MusqScreenState extends State<MusqScreen> with TickerProviderStateMixin {
           width: sizedphone.width * 0.96,
           child: ListView(
             physics:
-                BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+                const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
             //show all mosque
             children: listmosque
                 .map((item) => Container(
@@ -352,6 +355,9 @@ class _MusqScreenState extends State<MusqScreen> with TickerProviderStateMixin {
                                 mosquefollow = listmosque.firstWhere(
                                     (element) =>
                                         element.mosqueid == item.mosqueid);
+                                print("--> Request Mosuw" +
+                                    mosquefollow.mosqueid);
+                                subscribeTopic(mosquefollow.name);
                                 //fatch mosque data form api using mosque id
                                 await Provider.of<FatchData>(con, listen: false)
                                     .fatchandsetmosque(mosquefollow.mosqueid);
@@ -418,7 +424,7 @@ class _MusqScreenState extends State<MusqScreen> with TickerProviderStateMixin {
                                     .readdata();
                               }
                             },
-                            icon: Icon(
+                            icon: const Icon(
                               Icons.star,
                               color: Colors.grey,
                             )),
@@ -453,7 +459,7 @@ class _MusqScreenState extends State<MusqScreen> with TickerProviderStateMixin {
     _notificationHelper.initializeNotification();
     await FirebaseMessaging.instance
         .subscribeToTopic(name)
-        .then((value) => print(name));
+        .then((value) => print("subscribe" + name));
   }
 
   void unsubscribeTopic(String name) async {

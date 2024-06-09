@@ -47,8 +47,9 @@ class BottomNav extends StatefulWidget {
 }
 
 class _BottomNavState extends State<BottomNav> {
-  int _selectedIndex = 0;
+  final int _selectedIndex = 0;
 
+  @override
   Widget build(BuildContext context) {
     Map language = Provider.of<Buttonclickp>(context).languagepro;
     int inde = Provider.of<Buttonclickp>(context).indexnavigationbottmbar;
@@ -76,7 +77,7 @@ class _BottomNavState extends State<BottomNav> {
           ),
         ],
         currentIndex: inde,
-        selectedItemColor: Color(0xffD1B000),
+        selectedItemColor: const Color(0xffD1B000),
         onTap: (index) {
           //when user push any icon it well update screan
           inde = index;

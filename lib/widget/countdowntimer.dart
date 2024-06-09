@@ -17,12 +17,12 @@ class CountdownTimer extends StatefulWidget {
 
 class _CountdownTimerState extends State<CountdownTimer> {
   Timer? countdownTimer;
-  Duration myDuration = Duration(minutes: 0);
+  Duration myDuration = const Duration(minutes: 0);
   @override
   void initState() {
     settimerformadan();
     countdownTimer =
-        Timer.periodic(Duration(seconds: 1), (_) => setCountDown());
+        Timer.periodic(const Duration(seconds: 1), (_) => setCountDown());
 
     super.initState();
   }
@@ -37,7 +37,7 @@ class _CountdownTimerState extends State<CountdownTimer> {
   // Step 3
   void startTimer() {
     countdownTimer =
-        Timer.periodic(Duration(seconds: 1), (_) => setCountDown());
+        Timer.periodic(const Duration(seconds: 1), (_) => setCountDown());
   }
 
   void settimerformadan() async {
@@ -95,7 +95,7 @@ class _CountdownTimerState extends State<CountdownTimer> {
 
   // Step 6
   void setCountDown() async {
-    final reduceSecondsBy = 1;
+    const reduceSecondsBy = 1;
 
     setState(() {
       final seconds = myDuration.inSeconds - reduceSecondsBy;

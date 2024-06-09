@@ -14,6 +14,8 @@ class Reset {
 class ResetScreen extends StatelessWidget {
   static const routeName = '/reset';
 
+  const ResetScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     Map language = Provider.of<Buttonclickp>(context).languagepro;
@@ -26,6 +28,11 @@ class ResetScreen extends StatelessWidget {
     var sizedphone = MediaQuery.of(context).size;
 
     return Scaffold(
+      appBar: AppBar(leading: IconButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  icon:const Icon(Icons.arrow_back_ios)),),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Center(
@@ -34,7 +41,7 @@ class ResetScreen extends StatelessWidget {
                 SizedBox(
                   height: sizedphone.height * 0.2,
                 ),
-                Container(
+                SizedBox(
                     height: sizedphone.height * 0.2,
                     width: sizedphone.width * 0.3,
                     child: Image.asset('assets/images/reset.png')),
@@ -99,7 +106,7 @@ class ResetScreen extends StatelessWidget {
                     },
                     style: ButtonStyle(
                         padding: WidgetStateProperty.all<EdgeInsetsGeometry>(
-                            EdgeInsets.all(13)),
+                            const EdgeInsets.all(13)),
                         shape:
                             WidgetStateProperty.all<RoundedRectangleBorder>(
                                 RoundedRectangleBorder(

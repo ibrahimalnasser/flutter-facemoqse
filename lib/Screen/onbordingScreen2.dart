@@ -5,6 +5,8 @@ import 'package:onboarding_intro_screen/onboarding_screen.dart';
 class OnbordingScreen2 extends StatefulWidget {
   static const routeName = '/onbarding2';
 
+  const OnbordingScreen2({super.key});
+
   @override
   State<OnbordingScreen2> createState() => _OnbordingScreen2State();
 }
@@ -249,7 +251,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen2> {
                 child: const Text(
                   "Skip",
                   style: TextStyle(
-                    fontSize: 20,
+                    fontSize: 24,
                     fontWeight: FontWeight.w400,
                   ),
                 ),

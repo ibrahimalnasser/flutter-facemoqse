@@ -14,6 +14,8 @@ class Language {
 class LanguageScreen extends StatelessWidget {
   static const routeName = '/language';
 
+  const LanguageScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     var sizedphone = MediaQuery.of(context).size;
@@ -26,6 +28,13 @@ class LanguageScreen extends StatelessWidget {
       Language(lang: language['arabic'])
     ];
     return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            icon: const Icon(Icons.arrow_back_ios)),
+      ),
       body: SafeArea(
         child: Column(
           children: [
@@ -99,7 +108,7 @@ class LanguageScreen extends StatelessWidget {
                 },
                 style: ButtonStyle(
                     padding: WidgetStateProperty.all<EdgeInsetsGeometry>(
-                        EdgeInsets.all(13)),
+                        const EdgeInsets.all(13)),
                     shape: WidgetStateProperty.all<RoundedRectangleBorder>(
                         RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(18.0),

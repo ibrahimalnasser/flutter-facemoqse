@@ -8,13 +8,20 @@ import '../providers/respray.dart';
 class MessageScscreen extends StatelessWidget {
   static const routeName = '/message';
 
-  var _textcontroler = TextEditingController();
+  final _textcontroler = TextEditingController();
+
+  MessageScscreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     var sizedphone = MediaQuery.of(context).size;
     Map language = Provider.of<Buttonclickp>(context).languagepro;
     return Scaffold(
+      appBar: AppBar(leading: IconButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  icon:const Icon(Icons.arrow_back_ios)),),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -29,7 +36,7 @@ class MessageScscreen extends StatelessWidget {
               height: sizedphone.height * 0.1,
             ),
             Padding(
-              padding: EdgeInsets.all(15),
+              padding: const EdgeInsets.all(15),
               child: TextField(
                 controller: _textcontroler,
                 onChanged: (value) {},
@@ -58,13 +65,14 @@ class MessageScscreen extends StatelessWidget {
                 ElevatedButton(
                     child: Text(language['Send Message']),
                     onPressed: () async {
-                      if (_textcontroler.text.isNotEmpty)
+                      if (_textcontroler.text.isNotEmpty) {
                         await Provider.of<Respray>(context, listen: false)
                             .sendudp('create_msg ${_textcontroler.text}');
+                      }
                     },
                     style: ButtonStyle(
                         padding: WidgetStateProperty.all<EdgeInsetsGeometry>(
-                            EdgeInsets.all(13)),
+                            const EdgeInsets.all(13)),
                         shape: WidgetStateProperty.all<RoundedRectangleBorder>(
                             RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(18.0),
@@ -77,7 +85,7 @@ class MessageScscreen extends StatelessWidget {
                     },
                     style: ButtonStyle(
                         padding: WidgetStateProperty.all<EdgeInsetsGeometry>(
-                            EdgeInsets.all(13)),
+                            const EdgeInsets.all(13)),
                         shape: WidgetStateProperty.all<RoundedRectangleBorder>(
                             RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(18.0),

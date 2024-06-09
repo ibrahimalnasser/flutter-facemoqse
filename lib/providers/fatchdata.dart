@@ -1,14 +1,14 @@
-import 'dart:convert';
 import 'dart:async';
-import 'package:facemosque/providers/mosque.dart';
-import 'package:facemosque/providers/mosques.dart';
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:location/location.dart';
 import 'package:mapbox_api/mapbox_api.dart';
-
 import 'package:shared_preferences/shared_preferences.dart';
-//import 'package:geocoder_location/geocoder.dart';
+
+import 'package:facemosque/providers/mosque.dart';
+import 'package:facemosque/providers/mosques.dart';
 
 import 'package:latlong2/latlong.dart' as latlong;
 
@@ -57,6 +57,7 @@ class FatchData with ChangeNotifier {
       prymethod: '',
       activationcode: '',
       dateofstart: '',
+      Email: '',
       isFavrote: false);
   // Latlng are the coordinates to show a location on the map
   latlong.LatLng latlng1 = latlong.LatLng(0, 0);
@@ -76,6 +77,7 @@ class FatchData with ChangeNotifier {
       prymethod: '',
       activationcode: '',
       dateofstart: '',
+      Email: '',
       isFavrote: false);
   // store mosqueFollow.isFavrote value in SharedPreferences
   // if it true that mean mosque select for fatch data mousqe
@@ -88,7 +90,7 @@ class FatchData with ChangeNotifier {
   }
 
 // ask for location Permisson
-  void locationPermission() async {
+  /*void locationPermission() async {
     if (!kIsWeb) {
       final location = Location();
       final hasPermissions = await location.hasPermission();
@@ -96,12 +98,14 @@ class FatchData with ChangeNotifier {
         await location.requestPermission();
       }
     }
-  }
+  }*/
 
 // get LatLng from address using MapboxApi becuse FlutterMap Requires LatLng for Markars
   Future<void> loction() async {
     try {
-      print("-->Mosque" + mosqueFollow.houseno);
+      if (kDebugMode) {
+        print("-->Mosque" + mosqueFollow.Email);
+      }
       if (mosqueFollow.street != '') {
         MapboxApi mapbox = MapboxApi(
           accessToken:
@@ -117,10 +121,12 @@ class FatchData with ChangeNotifier {
             response.features![1].center![1], response.features![1].center![0]);
         notifyListeners();
       }
+      // ignore: empty_catches
     } catch (e) {}
   }
 
 // Search in mosquelist for mosque
+  // ignore: non_constant_identifier_names
   Future<void> Searchval(String val) async {
     final a = mosquelist.where((element) {
       final namemosq = element.name.toLowerCase();
@@ -138,7 +144,7 @@ class FatchData with ChangeNotifier {
     try {
       http.Response response = await http.get(
         Uri.parse(
-          "https://facemosque.eu/api/api.php?client=app&cmd=mosque_list&mosque",
+          "https://facemosque.eu/api/api.php?client=app&cmd=mosquelist",
         ),
         headers: {
           "Connection": "Keep-Alive",
@@ -146,17 +152,28 @@ class FatchData with ChangeNotifier {
           'Accept': 'application/json',
         },
       );
-      Iterable l = json.decode(
-          "${response.body.split('\n').toString().substring(0, response.body.split('\n').toString().length - 3)}]");
+      if (kDebugMode) {
+        print(response.body);
+      }
+      /*Iterable l = json.decode(
+          "${response.body.split('\n').toString().substring(0, response.body.split('\n').toString().length - 3)}]");*/
+      Iterable l = json.decode(response.body);
 
       mosquelist =
           List<Mosques>.from(l.map((model) => Mosques.fromJson(model)));
+      if (kDebugMode) {
+        print(response.body);
+      }
       for (var mosqueli in mosquelist) {
-        print(mosqueli.houseno);
+        if (kDebugMode) {
+          print(mosqueli.Email);
+        }
       }
       notifyListeners();
     } catch (e) {
-      print(e);
+      if (kDebugMode) {
+        print(e);
+      }
     }
   }
 
@@ -170,9 +187,11 @@ class FatchData with ChangeNotifier {
       if (preferences.containsKey('mosqueFollow')) {
         mosqueFollow = Mosques.fromJson(
             json.decode(preferences.getString('mosqueFollow')!));
-        Timer.periodic(Duration(days: 1), (timer) {
+        Timer.periodic(const Duration(days: 1), (timer) {
           fatchandsetmosque(mosqueFollow.mosqueid);
-          print(mosqueFollow);
+          if (kDebugMode) {
+            print(mosqueFollow);
+          }
         });
         loction();
 
@@ -193,7 +212,9 @@ class FatchData with ChangeNotifier {
 
       notifyListeners();
     } catch (e) {
-      print(e);
+      if (kDebugMode) {
+        print(e);
+      }
     }
   }
 
@@ -212,14 +233,17 @@ class FatchData with ChangeNotifier {
           'Accept': 'application/json',
         },
       );
-      print(jsonDecode(response.body));
+      if (kDebugMode) {
+        print(jsonDecode(utf8.decode(response.bodyBytes)));
+      }
       if (response.body == 'Mosque not exist') {
         mosqueFollow = mosquelist.firstWhere(
             (element) => int.parse(element.mosqueid) == int.parse(mosqid));
         prefs.setString('mosqueFollow', json.encode(mosqueFollow.toMap()));
         prefs.setString('mosqid', mosqid);
       } else {
-        Mosque mosqu = await Mosque.fromJson(jsonDecode(response.body));
+        var data = utf8.decode(response.bodyBytes);
+        Mosque mosqu = Mosque.fromJson(jsonDecode(data));
         mosqueFollow = mosquelist.firstWhere(
             (element) => int.parse(element.mosqueid) == int.parse(mosqid));
         prefs.setString('mosqueFollow', json.encode(mosqueFollow.toMap()));
@@ -235,7 +259,9 @@ class FatchData with ChangeNotifier {
       notifyListeners();
       // logLongString(mosque.toString());
     } catch (e) {
-      print(e);
+      if (kDebugMode) {
+        print(e);
+      }
     }
   }
 
@@ -269,22 +295,27 @@ class FatchData with ChangeNotifier {
           dataid: '');
       prefs.remove('mosque');
       prefs.remove('mosqueFollow');
+      prefs.remove('mosqid');
       mosqueFollow.clean();
       notifyListeners();
     } catch (e) {
-      print(e);
+      if (kDebugMode) {
+        print(e);
+      }
     }
   }
 
 // to print long String like all mousqe
   void logLongString(String s) {
-    if (s.isEmpty || s.length <= 0) return;
+    if (s.isEmpty || s.isEmpty) return;
     const int n = 1000;
     int startIndex = 0;
     int endIndex = n;
     while (startIndex < s.length) {
       if (endIndex > s.length) endIndex = s.length;
-      print(s.substring(startIndex, endIndex));
+      if (kDebugMode) {
+        print(s.substring(startIndex, endIndex));
+      }
       startIndex += n;
       endIndex = startIndex + n;
     }

@@ -8,6 +8,8 @@ import '../providers/buttonclick.dart';
 class ConnectScreen extends StatelessWidget {
   static const routeName = '/connect';
 
+  const ConnectScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     List<String> ips = Provider.of<Respray>(context).Ips;
@@ -19,6 +21,11 @@ class ConnectScreen extends StatelessWidget {
     String ipselected = '';
     print(ips);
     return Scaffold(
+      appBar: AppBar(leading: IconButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  icon:const Icon(Icons.arrow_back_ios)),),
       body: SafeArea(
           child: Column(
         children: [
@@ -37,7 +44,7 @@ class ConnectScreen extends StatelessWidget {
           Container(
             height: sizedphone.height * 0.67,
             width: sizedphone.width,
-            decoration: BoxDecoration(),
+            decoration: const BoxDecoration(),
             child: ListView(children: [
               GroupButton(
                 controller: settingController,
@@ -48,9 +55,9 @@ class ConnectScreen extends StatelessWidget {
                     buttonHeight: sizedphone.height * 0.1,
                     buttonWidth: sizedphone.width * 0.9,
                     unselectedTextStyle:
-                        TextStyle(fontSize: 18, color: Colors.black),
+                        const TextStyle(fontSize: 18, color: Colors.black),
                     selectedTextStyle:
-                        TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+                        const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
                 onSelected: (index, isSelected, t) {
                   ipselected = index.toString();
                   print('$ipselected button is selected');
@@ -71,7 +78,7 @@ class ConnectScreen extends StatelessWidget {
               },
               style: ButtonStyle(
                   padding: WidgetStateProperty.all<EdgeInsetsGeometry>(
-                      EdgeInsets.all(13)),
+                      const EdgeInsets.all(13)),
                   shape: WidgetStateProperty.all<RoundedRectangleBorder>(
                       RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(18.0),

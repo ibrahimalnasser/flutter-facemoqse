@@ -8,6 +8,8 @@ import '../providers/respray.dart';
 class VolumeScreen extends StatefulWidget {
   static const routeName = '/volume';
 
+  const VolumeScreen({super.key});
+
   @override
   State<VolumeScreen> createState() => _VolumeScreenState();
 }
@@ -21,13 +23,18 @@ class _VolumeScreenState extends State<VolumeScreen> {
     Map language = Provider.of<Buttonclickp>(context).languagepro;
 
     return Scaffold(
+      appBar: AppBar(leading: IconButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  icon:const Icon(Icons.arrow_back_ios)),),
       body: SingleChildScrollView(
         child: Column(
           children: [
             SizedBox(
               height: sizedphone.height * 0.2,
             ),
-            Container(
+            SizedBox(
                 height: sizedphone.height * 0.2,
                 width: sizedphone.width * 0.3,
                 child: Image.asset('assets/images/volume.png')),
@@ -64,7 +71,7 @@ class _VolumeScreenState extends State<VolumeScreen> {
                     },
                     style: ButtonStyle(
                         padding: WidgetStateProperty.all<EdgeInsetsGeometry>(
-                            EdgeInsets.all(13)),
+                            const EdgeInsets.all(13)),
                         shape:
                             WidgetStateProperty.all<RoundedRectangleBorder>(
                                 RoundedRectangleBorder(
@@ -79,7 +86,7 @@ class _VolumeScreenState extends State<VolumeScreen> {
                     },
                     style: ButtonStyle(
                         padding: WidgetStateProperty.all<EdgeInsetsGeometry>(
-                            EdgeInsets.all(13)),
+                            const EdgeInsets.all(13)),
                         shape:
                             WidgetStateProperty.all<RoundedRectangleBorder>(
                                 RoundedRectangleBorder(

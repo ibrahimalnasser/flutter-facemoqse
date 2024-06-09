@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import '../main.dart';
 import '../widget/notificationHelper.dart';
 
+//TODO: #2 creating a menua with different Muazan and deleting the notification checkboxs as they are in the main interfeca @ibrahimalnasser
 //Model of Language
 class Language {
   String lang;
@@ -25,7 +26,7 @@ class SettingsScreen extends StatefulWidget {
 enum Language1 { englich, arabic }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  NotificationHelper _notificationHelper = NotificationHelper();
+  final NotificationHelper _notificationHelper = NotificationHelper();
   @override
   Widget build(BuildContext context) {
     Language1? language1 = Provider.of<Buttonclickp>(context).languageselected

@@ -1,4 +1,3 @@
-
 import 'package:facemosque/Screen/homescreen.dart';
 import 'package:facemosque/Screen/onbordingScreen2.dart';
 import 'package:facemosque/main.dart';
@@ -12,9 +11,9 @@ import '../providers/buttonclick.dart';
 import '../providers/fatchdata.dart';
 import '../providers/messagesetting.dart';
 
-
-
 class SplachScreen2 extends StatefulWidget {
+  const SplachScreen2({super.key});
+
   @override
   _SplachScreen2State createState() => _SplachScreen2State();
 }
@@ -35,43 +34,43 @@ class _SplachScreen2State extends State<SplachScreen2> {
       debugPrint(e.toString());
     }
   }
+
   @override
   void initState() {
     super.initState();
-     
 
-    Timer(Duration(milliseconds: 400), () {
+    Timer(const Duration(milliseconds: 400), () {
       setState(() {
         _a = true;
       });
     });
-    Timer(Duration(milliseconds: 400), () {
+    Timer(const Duration(milliseconds: 400), () {
       setState(() {
         _b = true;
       });
     });
-    Timer(Duration(milliseconds: 1300), () {
+    Timer(const Duration(milliseconds: 1300), () {
       setState(() {
         _c = true;
       });
     });
-    Timer(Duration(milliseconds: 1700), () {
+    Timer(const Duration(milliseconds: 1700), () {
       setState(() {
         _e = true;
       });
     });
-    Timer(Duration(milliseconds: 3400), () {
+    Timer(const Duration(milliseconds: 3400), () {
       setState(() {
         _d = true;
       });
     });
     Provider.of<MessageSetting>(context, listen: false).getNotification();
-    changeStatusColor(Color(0xFF1ea345));
+    changeStatusColor(const Color(0xFF1ea345));
     //reload all mosque from api
     Provider.of<FatchData>(context, listen: false).fatchandsetallmosque();
     //read All data form SharedPreferences
     Provider.of<FatchData>(context, listen: false).readdata();
-  Provider.of<Auth>(context,listen: false).readuser();
+    Provider.of<Auth>(context, listen: false).readuser();
     //read adan notifications button state from SharedPreferences
     Provider.of<Buttonclickp>(context, listen: false).readsalaDay();
     // show all mosuqe or( mosuqefollow and map ) in tab My Mosuqe from SharedPreferences
@@ -80,21 +79,21 @@ class _SplachScreen2State extends State<SplachScreen2> {
     Provider.of<Buttonclickp>(context, listen: false).getreplacetoevent();
     //read language from SharedPreferences
     Provider.of<Buttonclickp>(context, listen: false).readlanguage();
-   
- //   int? initScreen ;
-    Timer(Duration(milliseconds: 3850), () {
-      
+
+    //   int? initScreen ;
+    Timer(const Duration(milliseconds: 3850), () {
       setState(() {
         Navigator.of(context).pushReplacement(
           ThisIsFadeRoute(
-            route:  initScreen == 0 || initScreen == null ? OnbordingScreen2() : HomeScreen(), page: Container(),
+            route: initScreen == 0 || initScreen == null
+                ? const OnbordingScreen2()
+                : const HomeScreen(),
+            page: Container(),
           ),
         );
       });
     });
-   
   }
-
 
   bool _a = false;
   bool _b = false;
@@ -112,7 +111,7 @@ class _SplachScreen2State extends State<SplachScreen2> {
     double _h = MediaQuery.of(context).size.height;
     double _w = MediaQuery.of(context).size.width;
     return Scaffold(
-      backgroundColor: Color(0xFF1ea345),
+      backgroundColor: const Color(0xFF1ea345),
       body: Center(
         child: Column(
           children: [
@@ -146,14 +145,12 @@ class _SplachScreen2State extends State<SplachScreen2> {
                       ? 130
                       : 20,
               decoration: BoxDecoration(
-                  color: _b ? Colors.white:Color(0xFF1ea345) ,
+                  color: _b ? Colors.white : const Color(0xFF1ea345),
                   // shape: _c? BoxShape.rectangle : BoxShape.circle,
-                  borderRadius:  _d ? BorderRadius.only() : BorderRadius.circular(20)
-                  ),
+                  borderRadius:
+                      _d ? const BorderRadius.only() : BorderRadius.circular(20)),
               child: Center(
-                child: _e
-                    ?Image.asset('assets/images/logo.png')
-                    : SizedBox(),
+                child: _e ? Image.asset('assets/images/logo.png') : const SizedBox(),
               ),
             ),
           ],
@@ -187,4 +184,3 @@ class ThisIsFadeRoute extends PageRouteBuilder {
           ),
         );
 }
-

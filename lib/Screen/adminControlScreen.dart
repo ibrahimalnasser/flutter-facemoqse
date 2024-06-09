@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
-
-import 'package:barcode_scan2/barcode_scan2.dart';
+import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:facemosque/Screen/LanguageScreen.dart';
 import 'package:facemosque/Screen/authscreen.dart';
 import 'package:facemosque/Screen/azanScreen.dart';
@@ -47,22 +46,20 @@ class GridItem {
 }
 
 class _AdminControlScreenState extends State<AdminControlScreen> {
-  ScanResult? scanResult;
-
   var _aspectTolerance = 0.00;
   var _selectedCamera = -1;
   var _useAutoFocus = true;
   var _autoEnableFlash = false;
   ConnectivityResult _connectionStatus = ConnectivityResult.none;
   final Connectivity _connectivity = Connectivity();
-  late StreamSubscription<ConnectivityResult> _connectivitySubscription;
-  Future<void> initConnectivity() async {
+  //late StreamSubscription<ConnectivityResult> _connectivitySubscription;
+  /*Future<void> initConnectivity() async {
     late ConnectivityResult result;
     // Platform messages may fail, so we use a try/catch PlatformException.
     try {
-      result = (await _connectivity.checkConnectivity()) as ConnectivityResult;
+    //  result = await _connectivity.checkConnectivity();
     } on PlatformException catch (e) {
-      print('Couldn\'t check connectivity status $e');
+      //  print('Couldn\'t check connectivity status $e');
       return;
     }
 
@@ -80,29 +77,23 @@ class _AdminControlScreenState extends State<AdminControlScreen> {
     setState(() {
       _connectionStatus = result;
     });
-  }
+  }*/
 
   @override
   void initState() {
     super.initState();
-    initConnectivity();
+    //initConnectivity();
 
-    _connectivitySubscription = _connectivity.onConnectivityChanged.listen(
-            _updateConnectionStatus as void Function(
-                List<ConnectivityResult> event)?)
-        as StreamSubscription<ConnectivityResult>;
+    //_connectivitySubscription =        _connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
   }
 
   @override
   void dispose() {
-    _connectivitySubscription.cancel();
+    //_connectivitySubscription.cancel();
     super.dispose();
   }
 
-  static final _possibleFormats = BarcodeFormat.values.toList()
-    ..removeWhere((e) => e == BarcodeFormat.unknown);
-
-  List<BarcodeFormat> selectedFormats = [..._possibleFormats];
+  //todo: #7 adding the item to control the raspberry to sync its data with the cloud @ibrahimalnasser
   @override
   Widget build(BuildContext context) {
     String lan = '';
@@ -228,18 +219,21 @@ class _AdminControlScreenState extends State<AdminControlScreen> {
                                       //
                                       if (list[i].url != 'reboot') {
                                         if (list[i].url == 'qr') {
-                                          await _scan();
-                                          if (scanResult!.rawContent != '') {
+                                          String scanResult =
+                                              await FlutterBarcodeScanner
+                                                  .scanBarcode(
+                                                      '#ff6666',
+                                                      'Cancel',
+                                                      true,
+                                                      ScanMode.QR);
+                                          if (scanResult != '') {
                                             Map a;
-                                            if (json.decode(
-                                                    scanResult!.rawContent)
+                                            if (json.decode(scanResult)
                                                 is Map) {
-                                              a = json.decode(
-                                                  scanResult!.rawContent);
+                                              a = json.decode(scanResult);
                                             } else {
                                               a = {"Mobile Number": '1'};
                                             }
-                                            print(a);
                                             await Provider.of<Auth>(context,
                                                     listen: false)
                                                 .chackqr(a['Mobile Number']);
@@ -447,10 +441,10 @@ class _AdminControlScreenState extends State<AdminControlScreen> {
                       Provider.of<Auth>(context, listen: false).logout();
                     },
                     style: ButtonStyle(
-                        padding: WidgetStateProperty.all<EdgeInsetsGeometry>(
+                        padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
                             EdgeInsets.all(13)),
                         shape:
-                            WidgetStateProperty.all<RoundedRectangleBorder>(
+                            MaterialStateProperty.all<RoundedRectangleBorder>(
                                 RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(18.0),
                         )))),
@@ -476,9 +470,9 @@ class _AdminControlScreenState extends State<AdminControlScreen> {
                                   .setisdoneserarching(false);
                             },
                             style: ButtonStyle(
-                                padding: WidgetStateProperty.all<
+                                padding: MaterialStateProperty.all<
                                     EdgeInsetsGeometry>(EdgeInsets.all(13)),
-                                shape: WidgetStateProperty.all<
+                                shape: MaterialStateProperty.all<
                                         RoundedRectangleBorder>(
                                     RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(18.0),
@@ -494,10 +488,10 @@ class _AdminControlScreenState extends State<AdminControlScreen> {
                           .sendudp('sync');
                     },
                     style: ButtonStyle(
-                        padding: WidgetStateProperty.all<EdgeInsetsGeometry>(
+                        padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
                             EdgeInsets.all(13)),
                         shape:
-                            WidgetStateProperty.all<RoundedRectangleBorder>(
+                            MaterialStateProperty.all<RoundedRectangleBorder>(
                                 RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(18.0),
                         )))),
@@ -520,13 +514,9 @@ class _AdminControlScreenState extends State<AdminControlScreen> {
     if (state) {
       Provider.of<Respray>(context, listen: false).sendudp(str1);
       lan = language[str2];
-      print(lan);
-      print(str1);
     } else {
       Provider.of<Respray>(context, listen: false).sendudp(str3);
       lan = language[str4];
-      print(lan);
-      print(str3);
     }
     Timer(Duration(seconds: 1), () {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -566,32 +556,5 @@ class _AdminControlScreenState extends State<AdminControlScreen> {
         return alert;
       },
     );
-  }
-
-  Future<void> _scan() async {
-    try {
-      final result = await BarcodeScanner.scan(
-        options: ScanOptions(
-          restrictFormat: selectedFormats,
-          useCamera: _selectedCamera,
-          autoEnableFlash: _autoEnableFlash,
-          android: AndroidOptions(
-            aspectTolerance: _aspectTolerance,
-            useAutoFocus: _useAutoFocus,
-          ),
-        ),
-      );
-      setState(() => scanResult = result);
-    } on PlatformException catch (e) {
-      setState(() {
-        scanResult = ScanResult(
-          type: ResultType.Error,
-          format: BarcodeFormat.unknown,
-          rawContent: e.code == BarcodeScanner.cameraAccessDenied
-              ? 'The user did not grant the camera permission!'
-              : 'Unknown error: $e',
-        );
-      });
-    }
   }
 }

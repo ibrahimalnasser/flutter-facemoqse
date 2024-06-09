@@ -11,12 +11,10 @@ import 'data.dart';
 
 class User {
   Mosques mosques;
-  String email;
   String time_zone;
   String asr_method;
   User({
     required this.mosques,
-    required this.email,
     required this.time_zone,
     required this.asr_method,
   });
@@ -24,7 +22,6 @@ class User {
   Map<String, dynamic> toMap() {
     return {
       'mosques': mosques.toMap(),
-      'email': email,
       'time_zone': time_zone,
       'asr_method': asr_method,
     };
@@ -33,7 +30,6 @@ class User {
   factory User.fromMap(Map<String, dynamic> map) {
     return User(
       mosques: Mosques.fromMap(map['mosques']),
-      email: map['email'] ?? '',
       time_zone: map['time_zone'] ?? '',
       asr_method: map['asr_method'] ?? '',
     );
@@ -47,7 +43,7 @@ class User {
 class Auth with ChangeNotifier {
   bool chackuserinvide = false;
 
-  User? user = null;
+  User? user;
 
   void readuser() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -56,14 +52,14 @@ class Auth with ChangeNotifier {
     }
   }
 
-  Future<void> register(String username, String first_n, String second_n,
-      String password, String email, String date_of_birth, String mac) async {
+  Future<void> register(String username, String firstN, String secondN,
+      String password, String email, String dateOfBirth, String mac) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
     try {
       http.Response response = await http.get(
         Uri.parse(
-          "https://facemosque.eu/api/api.php?client=app&cmd=admin_reg&username=$username&first_name=$first_n&second_name=$second_n&password=$password &email=$email&date_of_birth=$date_of_birth&mac=$mac ",
+          "https://facemosque.eu/api/api.php?client=app&cmd=admin_reg&username=$username&first_name=$firstN&second_name=$secondN&password=$password &email=$email&date_of_birth=$dateOfBirth&mac=$mac ",
         ),
         headers: {
           "Connection": "Keep-Alive",
@@ -88,8 +84,8 @@ class Auth with ChangeNotifier {
                 publicip: userjosn['pry_method'],
                 prymethod: userjosn['pry_method'],
                 activationcode: userjosn['activation_code'],
-                dateofstart: userjosn['time_zone']),
-            email: userjosn['email'],
+                dateofstart: userjosn['time_zone'],
+                Email: userjosn['email']),
             time_zone: userjosn['date_of_start'],
             asr_method: userjosn['asr_method']);
         prefs.setString('user', json.encode(user!.toMap()));
@@ -99,7 +95,7 @@ class Auth with ChangeNotifier {
 
       notifyListeners();
     } catch (e) {
-      throw e;
+      rethrow;
     }
   }
 
@@ -135,8 +131,8 @@ class Auth with ChangeNotifier {
                 publicip: userjosn['pry_method'],
                 prymethod: userjosn['pry_method'],
                 activationcode: userjosn['activation_code'],
-                dateofstart: userjosn['time_zone']),
-            email: userjosn['email'],
+                dateofstart: userjosn['time_zone'],
+                Email: userjosn['email']),
             time_zone: userjosn['date_of_start'],
             asr_method: userjosn['asr_method']);
         prefs.setString('user', json.encode(user!.toMap()));
@@ -146,17 +142,16 @@ class Auth with ChangeNotifier {
 
       notifyListeners();
     } catch (e) {
-      throw e;
+      rethrow;
     }
   }
 
-  Future<void> saveMassge(String title, String massege,String time,String number,String date) async {
-
-    
+  Future<void> saveMassge(String title, String massege, String time,
+      String number, String date) async {
     try {
       http.Response response = await http.post(
         Uri.parse(
-          "https://facemosque.eu/api/api.php?client=app&cmd=event_reg&mosque_id=${user!.mosques.mosqueid}&max_num=${number}&date=$date&time=${time}&event_name=$title",
+          "https://facemosque.eu/api/api.php?client=app&cmd=event_reg&mosque_id=${user!.mosques.mosqueid}&max_num=$number&date=$date&time=$time&event_name=$title",
         ),
         headers: {
           "Connection": "Keep-Alive",
@@ -173,10 +168,9 @@ class Auth with ChangeNotifier {
 
   Future sendtotaipc(String title, String massege, bool isEvent, String time,
       String date, String maxnum) async {
-        
-    saveMassge(title, massege,time,maxnum,date);
-    final postUrl = 'https://fcm.googleapis.com/fcm/send';
-    String toParams = "/topics/" + "${user!.mosques.name}";
+    saveMassge(title, massege, time, maxnum, date);
+    const postUrl = 'https://fcm.googleapis.com/fcm/send';
+    String toParams = "/topics/" + user!.mosques.name;
     var data = Data('', '', '', time, '', false, 0, 0);
     if (!isEvent) {
       data.Title = title;
@@ -197,19 +191,19 @@ class Auth with ChangeNotifier {
       data.Message = '$massege (${user!.mosques.name})';
       data.setMosqueId = int.parse(user!.mosques.mosqueid);
       data.eventId = DateTime.now().millisecondsSinceEpoch;
-      print(data.toString());
     }
 
     var d = {
+      "notification": {"title": title, "body": user!.mosques.name},
       'data': data.toMap(),
-      "to": "${toParams}",
+      "to": toParams,
       "priority": "high",
     };
 
     final headers = {
       'content-type': 'application/json',
       'Authorization':
-          'key=AAAAVsDP8HM:APA91bFzAki2VdS-uqd7X_xRhpYvufymmRjUghFjz2e0CjZQtVNDWSgC8OP9sMdGoMpkZtFOaBlcfo3LonpI_pbFPaC0Yk8cdEP7lR6j-KQ94HzmzxhQffQB3uoG3HnrolzQfZ7d0LCB'
+          'key=AAAAjt8_eGw:APA91bG9Gl-eBS34N08iEjRZTrAfoVnW9gZm9rRew9rW5rfxYUULB7Mf8i5zWjmD2NXZJUfDM4V5zFLsyEewUbifDyqdMPdsmCMMfTpw8GnWcHWETgdEUtIVrhasyp-lZUAApvJRMA50'
     };
     final response = await http.post(Uri.parse(postUrl),
         body: json.encode(d),
@@ -217,9 +211,9 @@ class Auth with ChangeNotifier {
         headers: headers);
 
     if (response.statusCode == 200) {
-      print("true");
+      print("true" + response.body);
     } else {
-      print("false");
+      print("false" + response.body);
     }
   }
 
@@ -235,10 +229,11 @@ class Auth with ChangeNotifier {
           'Accept': 'application/json',
         },
       );
-      if (response.body == '"user is registered"')
-        chackuserinvide = await true;
-      else if (response.body == '"user is not registered"')
-        chackuserinvide = await false;
+      if (response.body == '"user is registered"') {
+        chackuserinvide = true;
+      } else if (response.body == '"user is not registered"')
+        // ignore: curly_braces_in_flow_control_structures
+        chackuserinvide = false;
 
       print(response.body);
       notifyListeners();

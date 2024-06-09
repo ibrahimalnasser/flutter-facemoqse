@@ -36,6 +36,11 @@ class _HigiriScreenState extends State<HigiriScreen> {
   Widget build(BuildContext context) {
     Map language = Provider.of<Buttonclickp>(context).languagepro;
     return Scaffold(
+      appBar: AppBar(leading: IconButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  icon:const Icon(Icons.arrow_back_ios)),),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -106,17 +111,17 @@ class _HigiriScreenState extends State<HigiriScreen> {
             ],
           ),
           Padding(
-            padding: EdgeInsets.only(top: 10),
+            padding: const EdgeInsets.only(top: 10),
             child: ElevatedButton(
                 child: Text(language['Adding Days']),
                 onPressed: () {
                   Provider.of<Respray>(context, listen: false)
-                      .sendudp('Hijri ${count}')
+                      .sendudp('Hijri $count')
                       .then((value) => print('sdf'));
                 },
                 style: ButtonStyle(
                     padding: WidgetStateProperty.all<EdgeInsetsGeometry>(
-                        EdgeInsets.all(13)),
+                        const EdgeInsets.all(13)),
                     shape: WidgetStateProperty.all<RoundedRectangleBorder>(
                         RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(18.0),

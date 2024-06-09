@@ -9,7 +9,7 @@ class Data {
   bool? isEvent;
   int? mosqueId;
   int? eventId;
-  
+
   Data(
     this.Title,
     this.Message,
@@ -20,35 +20,35 @@ class Data {
     this.mosqueId,
     this.eventId,
   );
-  String? get getTitle => this.Title;
+  String? get getTitle => Title;
 
   set setTitle(String? Title) => this.Title = Title;
 
-  get getMessage => this.Message;
+  get getMessage => Message;
 
   set setMessage(Message) => this.Message = Message;
 
-  get getDate => this.date;
+  get getDate => date;
 
   set setDate(date) => this.date = date;
 
-  get getTime => this.time;
+  get getTime => time;
 
   set setTime(time) => this.time = time;
 
-  get getMaxPerson => this.maxPerson;
+  get getMaxPerson => maxPerson;
 
   set setMaxPerson(maxPerson) => this.maxPerson = maxPerson;
 
-  get getIsEvent => this.isEvent;
+  get getIsEvent => isEvent;
 
   set setIsEvent(isEvent) => this.isEvent = isEvent;
 
-  get getMosqueId => this.mosqueId;
+  get getMosqueId => mosqueId;
 
   set setMosqueId(int mosqueId) => this.mosqueId = mosqueId;
 
-  get getEventId => this.eventId;
+  get getEventId => eventId;
 
   set setEventId(eventId) => this.eventId = eventId;
 
@@ -60,7 +60,7 @@ class Data {
       'time': time,
       'maxPerson': maxPerson,
       'isEvent': isEvent,
-      'mosqueId': mosqueId,
+      'mosqueid': mosqueId,
       'eventId': eventId,
     };
   }

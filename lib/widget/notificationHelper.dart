@@ -58,15 +58,14 @@ class NotificationHelper {
       message.hashCode,
       message.title,
       message.message,
-      NotificationDetails(
+      const NotificationDetails(
         android: AndroidNotificationDetails(
-          'your channel id asdf',
-          'abdalkremm',
-          channelDescription: 'socool',
-          importance: Importance.max,
-          priority: Priority.high,
-          playSound: true,
-        ),
+            'your channel id asdf', 'abdalkremm',
+            channelDescription: 'socool',
+            importance: Importance.max,
+            priority: Priority.high,
+            playSound: true,
+            sound: RawResourceAndroidNotificationSound('notification')),
         iOS: DarwinNotificationDetails(sound: 'assets/mp3/notification.mp3'),
       ),
       payload: 'It could be anything you pass',
@@ -86,7 +85,7 @@ class NotificationHelper {
       id,
       body == false ? 'It\'s time for adan' : 'حان موعد اذان ',
       title,
-      _convertTime(hour, minutes),
+      _convertTime(hour - 2, minutes),
       NotificationDetails(
         android: AndroidNotificationDetails(
           'your channel id 2',
