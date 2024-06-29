@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:facemosque/widget/loctionmosque.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -193,7 +194,9 @@ class _MusqScreenState extends State<MusqScreen> with TickerProviderStateMixin {
                             ))),
                             onPressed: () {
                               MapLauncher.showMarker(
-                                mapType: MapType.google,
+                                mapType: Platform.isAndroid
+                                    ? MapType.google
+                                    : MapType.apple,
                                 coords: Coords(l.latitude, l.longitude),
                                 title: mosquefollow.name,
                                 zoom: 20,
@@ -328,8 +331,8 @@ class _MusqScreenState extends State<MusqScreen> with TickerProviderStateMixin {
           height: sizedphone.height * 0.63,
           width: sizedphone.width * 0.96,
           child: ListView(
-            physics:
-                const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+            physics: const BouncingScrollPhysics(
+                parent: AlwaysScrollableScrollPhysics()),
             //show all mosque
             children: listmosque
                 .map((item) => Container(
