@@ -9,7 +9,7 @@ import connectivity_plus
 import firebase_core
 import firebase_messaging
 import flutter_local_notifications
-import flutter_native_timezone
+import flutter_native_timezone_updated_gradle
 import location
 import network_info_plus
 import path_provider_foundation

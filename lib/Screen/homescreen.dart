@@ -9,8 +9,11 @@ import 'package:facemosque/Screen/musqScreen.dart';
 import 'package:facemosque/providers/auth.dart';
 import 'package:facemosque/providers/fatchdata.dart';
 import 'package:facemosque/providers/mosque.dart';
+import 'package:facemosque/providers/mosques.dart';
 import 'package:facemosque/widget/countdowntimer.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:facemosque/Screen/eventnotifications.dart';
@@ -20,12 +23,86 @@ import 'package:facemosque/widget/bottomnav.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:swipe/swipe.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
-import "package:persistent_bottom_nav_bar/persistent_tab_view.dart";
+import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
 
 //import "package:persistent_bottom_nav_bar_example_project/custom-widget-tabs.widget.dart";
 //import "package:persistent_bottom_nav_bar_example_project/screens.dart";
 import '../main.dart';
 import '../widget/notificationHelper.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import '../providers/events.dart';
+
+class ApiService {
+  List<Event> filterEvents(List<Event> events) {
+    DateTime currentDate = DateTime.now();
+    List<Event> tmp = [];
+
+    for (var i = 0; i < events.length; i++) {
+      DateTime eventDate = DateTime.parse(events[i].eventDate);
+      String frequency = events[i].eventFrequencyDay;
+      if (frequency == 'single' && eventDate.isAtSameMomentAs(currentDate)) {
+        // ignore: dead_code
+        tmp.add(events[i]);
+        //return eventDate.isAtSameMomentAs(currentDate);
+      } else if (frequency == 'weekly' &&
+          currentDate
+              .isBefore(DateTime.parse(events[i].eventFrequencyEndDate))) {
+        if (eventDate.weekday == currentDate.weekday) {
+          tmp.add(events[i]);
+        }
+      } else if (frequency == 'monthly' &&
+          currentDate
+              .isBefore(DateTime.parse(events[i].eventFrequencyEndDate))) {
+        if (eventDate.day == currentDate.day) {
+          tmp.add(events[i]);
+        }
+      } else if (frequency == 'yearly' &&
+          currentDate
+              .isBefore(DateTime.parse(events[i].eventFrequencyEndDate))) {
+        if (eventDate.month == currentDate.month &&
+            eventDate.day == currentDate.day) {
+          tmp.add(events[i]);
+        }
+      } else if (frequency == 'daily' &&
+          currentDate
+              .isBefore(DateTime.parse(events[i].eventFrequencyEndDate))) {
+        tmp.add(events[i]);
+      }
+    }
+    return tmp;
+  }
+
+  Future<List<Event>> fetchEvents(String mosqueID) async {
+    String apiUrl =
+        'https://facemosque.com/api/api.php?client=app&cmd=gettingEvents&mosqueId=' +
+            mosqueID;
+
+    try {
+      final response = await http.get(Uri.parse(apiUrl));
+
+      if (response.statusCode == 200) {
+        List<dynamic> jsonResponse = json.decode(response.body);
+        List<Event> events =
+            jsonResponse.map((data) => Event.fromJson(data)).toList();
+        List<Event> filteredEvents = filterEvents(events);
+        _printEvents(filteredEvents);
+        return filteredEvents;
+      } else {
+        return []; // Return an empty list if the response is not successful
+      }
+    } catch (e) {
+      return []; // Return an empty list if there is an error during the request
+    }
+  }
+
+  void _printEvents(List<Event> events) {
+    for (Event event in events) {
+      print(
+          'Event Name: ${event.eventName}, Date: ${event.eventDate}, Time: ${event.eventTime}');
+    }
+  }
+}
 
 class MySlider {
   String time;
@@ -51,6 +128,8 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final NotificationHelper _notificationHelper = NotificationHelper();
+  late Future<List<Event>> futureEvents;
+
   //late PersistentTabController _controller;
   //late bool _hideNavBar;
   @override
@@ -74,10 +153,11 @@ class _HomeScreenState extends State<HomeScreen> {
     //Provider.of<FatchData>(context, listen: false).locationPermission();
     //call mosque form provider (FatchData) if not select mosque it well show Noting in All Text
     Mosque mosque = Provider.of<FatchData>(context).mosque;
-
-    String mosquefollow = Provider.of<FatchData>(context).mosqueFollow.name;
+    Mosques followedMosque = Provider.of<FatchData>(context).mosqueFollow;
+    String mosquefollow = followedMosque.name;
     String msoqueFollowEmail =
         Provider.of<FatchData>(context).mosqueFollow.Email;
+    futureEvents = ApiService().fetchEvents(followedMosque.mosqueid);
 
     //call Map(languagepro) from provider (Buttonclickp) return en language as default
     //have all key of word we need
@@ -814,7 +894,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       ),
                                     ])),*/
                             Container(
-                              height: sizedphone.height * 0.58,
+                              height: sizedphone.height * 0.40,
                               width: sizedphone.width * 0.95,
                               decoration: BoxDecoration(
                                 image: const DecorationImage(
@@ -900,7 +980,248 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ))
                                 ],
                               ),
-                            )
+                            ),
+                            Container(
+                                width: sizedphone.width * 0.95,
+                                margin: const EdgeInsets.symmetric(vertical: 8),
+                                decoration: BoxDecoration(
+                                  image: const DecorationImage(
+                                      image: AssetImage(
+                                          "assets/images/quranbackground.jpg"),
+                                      fit: BoxFit.cover,
+                                      opacity: 0.05),
+                                  border: Border.all(
+                                      color: const Color(0xffD1B000), width: 2),
+                                  borderRadius: BorderRadius.circular(20),
+                                  color: Theme.of(context).primaryColor,
+                                ),
+                                child: Column(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceAround,
+                                    children: [
+                                      titlel(language['events']),
+                                      FutureBuilder<List<Event>>(
+                                        future: futureEvents,
+                                        builder: (context, snapshot) {
+                                          if (snapshot.connectionState ==
+                                              ConnectionState.waiting) {
+                                            return Center(
+                                                child:
+                                                    CircularProgressIndicator());
+                                          } else if (snapshot.hasError) {
+                                            return Center(
+                                                child: Text(
+                                                    'Error: ${snapshot.error}'));
+                                          } else if (snapshot.hasData) {
+                                            List<Event> events = snapshot.data!;
+                                            return ListView.builder(
+                                              // scrollDirection: Axis.vertical,
+                                              physics:
+                                                  NeverScrollableScrollPhysics(),
+
+                                              shrinkWrap: true,
+                                              padding: EdgeInsets.all(5),
+                                              itemCount: events.length,
+                                              itemBuilder: (context, index) {
+                                                return Padding(
+                                                    padding:
+                                                        EdgeInsetsDirectional
+                                                            .fromSTEB(
+                                                                15.0,
+                                                                10.0,
+                                                                15.0,
+                                                                0.0),
+                                                    child: InkWell(
+                                                      onTap: () => showDialog<
+                                                              String>(
+                                                          context: context,
+                                                          builder: (BuildContext
+                                                                  context) =>
+                                                              AlertDialog(
+                                                                title: const Text(
+                                                                    'Event Description'),
+                                                                content: Text(
+                                                                    events[index]
+                                                                        .eventDesc),
+                                                                actions: <Widget>[
+                                                                  TextButton(
+                                                                    onPressed: () =>
+                                                                        Navigator.pop(
+                                                                            context,
+                                                                            'OK'),
+                                                                    child:
+                                                                        const Text(
+                                                                            'OK'),
+                                                                  ),
+                                                                ],
+                                                              )),
+                                                      child: Container(
+                                                        width: 361.0,
+                                                        height: 75.0,
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          color:
+                                                              Theme.of(context)
+                                                                  .primaryColor,
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(
+                                                                      10.0),
+                                                          border: Border.all(
+                                                            color: const Color(
+                                                                0xffD1B000),
+                                                            width: 2.0,
+                                                          ),
+                                                        ),
+                                                        child: Row(
+                                                          mainAxisSize:
+                                                              MainAxisSize.max,
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .spaceBetween,
+                                                          children: [
+                                                            Align(
+                                                              alignment:
+                                                                  AlignmentDirectional(
+                                                                      -1.0,
+                                                                      0.0),
+                                                              child: Column(
+                                                                mainAxisSize:
+                                                                    MainAxisSize
+                                                                        .min,
+                                                                mainAxisAlignment:
+                                                                    MainAxisAlignment
+                                                                        .spaceBetween,
+                                                                crossAxisAlignment:
+                                                                    CrossAxisAlignment
+                                                                        .start,
+                                                                children: [
+                                                                  Align(
+                                                                    alignment:
+                                                                        AlignmentDirectional(
+                                                                            -1.0,
+                                                                            0.0),
+                                                                    child:
+                                                                        Padding(
+                                                                      padding: EdgeInsetsDirectional.fromSTEB(
+                                                                          8.0,
+                                                                          4.0,
+                                                                          0.0,
+                                                                          0.0),
+                                                                      child:
+                                                                          AutoSizeText(
+                                                                        events[index]
+                                                                            .eventName,
+                                                                        minFontSize:
+                                                                            24.0,
+                                                                        style: Theme.of(context)
+                                                                            .textTheme
+                                                                            .displayLarge!,
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                  Align(
+                                                                    alignment:
+                                                                        AlignmentDirectional(
+                                                                            -1.0,
+                                                                            0.0),
+                                                                    child:
+                                                                        Padding(
+                                                                      padding: EdgeInsetsDirectional.fromSTEB(
+                                                                          8.0,
+                                                                          3.0,
+                                                                          0.0,
+                                                                          0.0),
+                                                                      child:
+                                                                          Text(
+                                                                        events[index]
+                                                                            .participantName,
+                                                                        style: TextStyle(
+                                                                            color:
+                                                                                const Color(0xffD1B000),
+                                                                            fontSize: 10),
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            ),
+                                                            Padding(
+                                                              padding:
+                                                                  EdgeInsetsDirectional
+                                                                      .fromSTEB(
+                                                                          0.0,
+                                                                          0.0,
+                                                                          8.0,
+                                                                          0.0),
+                                                              child:
+                                                                  AutoSizeText(
+                                                                '${events[index].eventTime}',
+                                                                minFontSize: 24,
+                                                                style: Theme.of(
+                                                                        context)
+                                                                    .textTheme
+                                                                    .displayLarge!,
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    ));
+
+                                                /*Container(
+                                                  height:
+                                                      sizedphone.height * 0.09,
+                                                  width:
+                                                      sizedphone.width * 0.60,
+                                                  margin: const EdgeInsets
+                                                      .symmetric(vertical: 6),
+                                                  padding:
+                                                      const EdgeInsets.all(8),
+                                                  decoration: BoxDecoration(
+                                                    color: Theme.of(context)
+                                                        .primaryColor,
+                                                    image: const DecorationImage(
+                                                        image: AssetImage(
+                                                            "assets/images/quranbackground.jpg"),
+                                                        fit: BoxFit.cover,
+                                                        opacity: 0.1),
+                                                    border: Border.all(
+                                                        color: const Color(
+                                                            0xffD1B000),
+                                                        width: 2),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            10),
+                                                  ),
+                                                  child: Column(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment.start,
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      AutoSizeText(
+                                                          events[index]
+                                                              .eventName,
+                                                          style: Theme.of(
+                                                                  context)
+                                                              .textTheme
+                                                              .displayLarge),
+                                                      Text(
+                                                          '${events[index].eventDate} at ${events[index].eventTime}'),
+                                                    ],
+                                                  ),
+                                                );*/
+                                              },
+                                            );
+                                          } else {
+                                            return Center(
+                                                child: Text('No events found'));
+                                          }
+                                        },
+                                      ),
+                                    ]))
                           ],
                         )
                       // if user click favorite icon index(1) it well show MusqScreen

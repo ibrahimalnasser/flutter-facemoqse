@@ -153,7 +153,8 @@ class Buttonclickp with ChangeNotifier {
     'Times are being update': 'Times are being update',
     'Updated': 'Updated',
     'Date': 'for Date ',
-    'Friday': 'Friday Prayer'
+    'Friday': 'Friday Prayer',
+    'events': 'Events Today'
   };
   Map<String, String> ar = {
     'titlenamemasjed': 'مواقيت الصلاة و الإقامة لجامع',
@@ -285,7 +286,8 @@ class Buttonclickp with ChangeNotifier {
     'Times are being update': 'جاري تحديث الاوقات ',
     'Updated': 'تم التحديث',
     'Date': 'ليوم',
-    'Friday': 'صلاة الجمعة'
+    'Friday': 'صلاة الجمعة',
+    'events': 'الفعاليات اليوم'
   };
 
   String parerEdit = '';

@@ -58,7 +58,7 @@ class Mosques {
 
   Map<String, dynamic> toMap() {
     return {
-      'mosqueid': mosqueid,
+      'mosque_id': mosqueid,
       'mac': mac,
       'name': name,
       'countryid': countryid,
@@ -105,7 +105,7 @@ class Mosques {
 
   factory Mosques.fromMap(Map<String, dynamic> map) {
     return Mosques(
-      mosqueid: map['mosqueid'] ?? '',
+      mosqueid: map['mosque_id'] ?? '',
       mac: map['mac'] ?? '',
       name: map['name'] ?? '',
       countryid: map['countryid'] ?? '',
