@@ -113,7 +113,7 @@ class FatchData with ChangeNotifier {
         );
         final GeocodingApiResponse response =
             await mapbox.forwardGeocoding.request(
-          searchText: '\${mosqueFollow.street}. \${mosqueFollow.houseno}',
+          searchText: '${mosqueFollow.street}. ${mosqueFollow.houseno}',
           fuzzyMatch: true,
           language: 'en',
         );

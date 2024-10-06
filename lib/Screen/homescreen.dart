@@ -916,21 +916,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   // I cearte method for next parer and today aya with seam shape and color and pass text
                                   titlel(language['nextparer']),
                                   mosque.isha != ''
-                                      ? DateFormat("hh:mm")
-                                              .parse(mosque.isha.split(':')[0] +
-                                                  ':' +
-                                                  mosque.isha.split(':')[1])
-                                              .isAfter(DateFormat("hh:mm").parse(
-                                                  DateTime.now().hour.toString() +
-                                                      ':' +
-                                                      DateTime.now()
-                                                          .minute
-                                                          .toString()))
-                                          ? const CountdownTimer()
-                                          : Text(language['Today\'s prayers are over'],
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .displayLarge)
+                                      ? const CountdownTimer()
                                       : Text(
                                           language[
                                               'Select the mosque to see the last prayer'],

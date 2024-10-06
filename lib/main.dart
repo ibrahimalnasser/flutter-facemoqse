@@ -103,7 +103,7 @@ Future<void> updateMosuqe() async {
         Mosque mosque = Mosque.fromJson(mosqueJson);
 
         // Store the mosque object in SharedPreferences
-        preferences.setString('mosque', json.encode(mosque.toJson()));
+        preferences.setString('mosque', json.encode(mosque.toMap()));
 
         // Optionally show a success message
         final snackBar = SnackBar(
@@ -215,81 +215,80 @@ void alarmadan(String adan) async {
     if (adanState) {
       if (prefs.containsKey('mosque')) {
         // Get the mosque data from SharedPreferences
-        String? mosqueData = prefs.getString('mosque');
+        String test = prefs.getString('mosque')!;
+        Mosque mosque = Mosque.fromJson(json.decode(test));
 
-        if (mosqueData != null && mosqueData.isNotEmpty) {
-          try {
-            // Decode the mosque data from JSON string to Map<String, dynamic>
-            Map<String, dynamic> mosqueJson =
-                json.decode(jsonDecode(mosqueData));
+        try {
+          // Print the formatted string
+          // Decode the mosque data from JSON string to Map<String, dynamic>
 
-            // Parse the mosque object from the decoded JSON map
-            Mosque mosque = Mosque.fromJson(mosqueJson);
+          // Parse the mosque object from the decoded JSON map
+          /* Mosque mosque =
+                Mosque.fromJson(mosqueJson);*/
 
-            if (adan == 'fajer') {
-              if (mosque.fajer != '') {
-                var timehm = mosque.fajer.split(':');
-                _notificationHelper.scheduledNotification(
-                  body: lang,
-                  title: lang ? 'الفجر' : adan,
-                  hour: int.parse(timehm[0]),
-                  minutes: int.parse(timehm[1]),
-                  id: 0,
-                  sound: 'adan',
-                );
-              }
-            } else if (adan == 'dhuhr') {
-              if (mosque.dhuhr != '') {
-                var timehm = mosque.dhuhr.split(':');
-                _notificationHelper.scheduledNotification(
-                  body: lang,
-                  title: lang ? 'الظهر' : adan,
-                  hour: int.parse(timehm[0]),
-                  minutes: int.parse(timehm[1]),
-                  id: 1,
-                  sound: 'adan',
-                );
-              }
-            } else if (adan == 'asr') {
-              if (mosque.asr != '') {
-                var timehm = mosque.asr.split(':');
-                _notificationHelper.scheduledNotification(
-                  body: lang,
-                  title: lang ? 'العصر' : adan,
-                  hour: int.parse(timehm[0]),
-                  minutes: int.parse(timehm[1]),
-                  id: 2,
-                  sound: 'adan',
-                );
-              }
-            } else if (adan == 'magrib') {
-              if (mosque.magrib != '') {
-                var timehm = mosque.magrib.split(':');
-                _notificationHelper.scheduledNotification(
-                  body: lang,
-                  title: lang ? 'المغرب' : adan,
-                  hour: int.parse(timehm[0]),
-                  minutes: int.parse(timehm[1]),
-                  id: 3,
-                  sound: 'adan',
-                );
-              }
-            } else if (adan == 'isha') {
-              if (mosque.isha != '') {
-                var timehm = mosque.isha.split(':');
-                _notificationHelper.scheduledNotification(
-                  body: lang,
-                  title: lang ? 'العشاء' : adan,
-                  hour: int.parse(timehm[0]),
-                  minutes: int.parse(timehm[1]),
-                  id: 4,
-                  sound: 'adan',
-                );
-              }
+          if (adan == 'fajer') {
+            if (mosque.fajer != '') {
+              var timehm = mosque.fajer.split(':');
+              _notificationHelper.scheduledNotification(
+                body: lang,
+                title: lang ? 'الفجر' : adan,
+                hour: int.parse(timehm[0]),
+                minutes: int.parse(timehm[1]),
+                id: 0,
+                sound: 'adan',
+              );
             }
-          } catch (e) {
-            print('Error parsing mosque data: $e');
+          } else if (adan == 'dhuhr') {
+            if (mosque.dhuhr != '') {
+              var timehm = mosque.dhuhr.split(':');
+              _notificationHelper.scheduledNotification(
+                body: lang,
+                title: lang ? 'الظهر' : adan,
+                hour: int.parse(timehm[0]),
+                minutes: int.parse(timehm[1]),
+                id: 1,
+                sound: 'adan',
+              );
+            }
+          } else if (adan == 'asr') {
+            if (mosque.asr != '') {
+              var timehm = mosque.asr.split(':');
+              _notificationHelper.scheduledNotification(
+                body: lang,
+                title: lang ? 'العصر' : adan,
+                hour: int.parse(timehm[0]),
+                minutes: int.parse(timehm[1]),
+                id: 2,
+                sound: 'adan',
+              );
+            }
+          } else if (adan == 'magrib') {
+            if (mosque.magrib != '') {
+              var timehm = mosque.magrib.split(':');
+              _notificationHelper.scheduledNotification(
+                body: lang,
+                title: lang ? 'المغرب' : adan,
+                hour: int.parse(timehm[0]),
+                minutes: int.parse(timehm[1]),
+                id: 3,
+                sound: 'adan',
+              );
+            }
+          } else if (adan == 'isha') {
+            if (mosque.isha != '') {
+              var timehm = mosque.isha.split(':');
+              _notificationHelper.scheduledNotification(
+                body: lang,
+                title: lang ? 'العشاء' : adan,
+                hour: int.parse(timehm[0]),
+                minutes: int.parse(timehm[1]),
+                id: 4,
+                sound: 'adan',
+              );
+            }
           }
+        } catch (e) {
+          print('Error parsing mosque data: $e');
         }
       }
     }

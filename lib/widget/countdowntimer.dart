@@ -45,42 +45,37 @@ class _CountdownTimerState extends State<CountdownTimer> {
       Mosque mosque =
           Mosque.fromJson(json.decode(preferences.getString('mosque')!));
 
-      List<String> prayerTimes = [
-        mosque.fajer,
-        mosque.sharouq,
-        mosque.dhuhr,
-        mosque.asr,
-        mosque.magrib,
-        mosque.isha
+      List<DateTime> prayerTimes = [
+        _getDateTimeFromPrayerTime(mosque.fajer, false),
+        _getDateTimeFromPrayerTime(mosque.sharouq, false),
+        _getDateTimeFromPrayerTime(mosque.dhuhr, false),
+        _getDateTimeFromPrayerTime(mosque.asr, false),
+        _getDateTimeFromPrayerTime(mosque.magrib, false),
+        _getDateTimeFromPrayerTime(mosque.isha, false),
+        _getDateTimeFromPrayerTime(mosque.fajer, true)
       ];
 
       bool foundNextPrayer = false;
       DateTime previousPrayerTime = now; // Placeholder for the last prayer time
       DateTime nextPrayerTime = now; // Placeholder for the next prayer time
-
-      for (String prayer in prayerTimes) {
-        DateTime prayerTime = _getDateTimeFromPrayerTime(prayer);
-        if (prayerTime.isAfter(now)) {
-          timehm = prayer.split(':');
-          foundNextPrayer = true;
-          nextPrayerTime = prayerTime;
+      for (var i = 0; i < prayerTimes.length; i++) {
+        if (prayerTimes[i].isAfter(now)) {
+          nextPrayerTime = prayerTimes[i];
           break;
         }
-        previousPrayerTime = prayerTime;
+        if (i == 0)
+          previousPrayerTime = prayerTimes[prayerTimes.length - 1];
+        else
+          previousPrayerTime = prayerTimes[i - 1];
       }
 
       // If no prayer time found, assume it's the next fajr (next day)
-      if (!foundNextPrayer) {
-        timehm = mosque.fajer.split(':');
-        now = now.add(const Duration(days: 1));
-        nextPrayerTime = _getDateTimeFromPrayerTime(mosque.fajer);
-      }
 
       DateTime tempDate = DateTime(now.year, now.month, now.day,
           int.parse(timehm[0]), int.parse(timehm[1]));
 
       myDuration = Duration(
-        seconds: tempDate.difference(now).inSeconds,
+        seconds: nextPrayerTime.difference(now).inSeconds,
       );
 
       totalTimeBetweenPrayers = nextPrayerTime.difference(previousPrayerTime);
@@ -91,11 +86,15 @@ class _CountdownTimerState extends State<CountdownTimer> {
     }
   }
 
-  DateTime _getDateTimeFromPrayerTime(String prayerTime) {
+  DateTime _getDateTimeFromPrayerTime(String prayerTime, bool nextDay) {
     List<String> parts = prayerTime.split(':');
     int hour = int.parse(parts[0]);
     int minute = int.parse(parts[1]);
-    DateTime now = DateTime.now();
+    DateTime now;
+    if (nextDay)
+      now = DateTime.now().add(const Duration(days: 1));
+    else
+      now = DateTime.now();
     return DateTime(now.year, now.month, now.day, hour, minute);
   }
 
