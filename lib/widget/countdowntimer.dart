@@ -1,7 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'package:intl/intl.dart';
-
 import 'package:facemosque/providers/mosque.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -18,13 +16,13 @@ class CountdownTimer extends StatefulWidget {
 class _CountdownTimerState extends State<CountdownTimer> {
   Timer? countdownTimer;
   Duration myDuration = const Duration(minutes: 0);
+  Duration totalTimeBetweenPrayers = const Duration(minutes: 0);
+
   @override
   void initState() {
-    settimerformadan();
-    countdownTimer =
-        Timer.periodic(const Duration(seconds: 1), (_) => setCountDown());
-
     super.initState();
+    setTimerForAdhan();
+    startTimer();
   }
 
   @override
@@ -33,94 +31,115 @@ class _CountdownTimerState extends State<CountdownTimer> {
     super.dispose();
   }
 
-  /// Timer related methods ///
-  // Step 3
   void startTimer() {
     countdownTimer =
         Timer.periodic(const Duration(seconds: 1), (_) => setCountDown());
   }
 
-  void settimerformadan() async {
+  void setTimerForAdhan() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
-    DateTime now = DateFormat("hh:mm").parse(DateTime.now().hour.toString() +
-        ':' +
-        DateTime.now().minute.toString());
+    DateTime now = DateTime.now();
 
     if (preferences.containsKey('mosque')) {
       var timehm = ['0', '0'];
       Mosque mosque =
           Mosque.fromJson(json.decode(preferences.getString('mosque')!));
-      if (DateFormat("hh:mm")
-          .parse(mosque.fajer.split(':')[0] + ':' + mosque.fajer.split(':')[1])
-          .isAfter(now)) {
-        timehm = mosque.fajer.split(':');
-      } else if (DateFormat("hh:mm")
-          .parse(
-              mosque.sharouq.split(':')[0] + ':' + mosque.sharouq.split(':')[1])
-          .isAfter(now)) {
-        timehm = mosque.sharouq.split(':');
-      } else if (DateFormat("hh:mm")
-          .parse(mosque.dhuhr.split(':')[0] + ':' + mosque.dhuhr.split(':')[1])
-          .isAfter(now)) {
-        timehm = mosque.dhuhr.split(':');
-      } else if (DateFormat("hh:mm")
-          .parse(mosque.asr.split(':')[0] + ':' + mosque.asr.split(':')[1])
-          .isAfter(now)) {
-        timehm = mosque.asr.split(':');
-      } else if (DateFormat("hh:mm")
-          .parse(
-              mosque.magrib.split(':')[0] + ':' + mosque.magrib.split(':')[1])
-          .isAfter(now)) {
-        timehm = mosque.magrib.split(':');
-      } else if (DateFormat("hh:mm")
-          .parse(mosque.isha.split(':')[0] + ':' + mosque.isha.split(':')[1])
-          .isBefore(now)) {
-        timehm = mosque.isha.split(':');
-      } else {
-        timehm = ['0', '0'];
-        countdownTimer?.cancel();
+
+      List<String> prayerTimes = [
+        mosque.fajer,
+        mosque.sharouq,
+        mosque.dhuhr,
+        mosque.asr,
+        mosque.magrib,
+        mosque.isha
+      ];
+
+      bool foundNextPrayer = false;
+      DateTime previousPrayerTime = now; // Placeholder for the last prayer time
+      DateTime nextPrayerTime = now; // Placeholder for the next prayer time
+
+      for (String prayer in prayerTimes) {
+        DateTime prayerTime = _getDateTimeFromPrayerTime(prayer);
+        if (prayerTime.isAfter(now)) {
+          timehm = prayer.split(':');
+          foundNextPrayer = true;
+          nextPrayerTime = prayerTime;
+          break;
+        }
+        previousPrayerTime = prayerTime;
       }
 
-      DateTime tempDate =
-          DateFormat("hh:mm").parse(timehm[0] + ":" + timehm[1]);
+      // If no prayer time found, assume it's the next fajr (next day)
+      if (!foundNextPrayer) {
+        timehm = mosque.fajer.split(':');
+        now = now.add(const Duration(days: 1));
+        nextPrayerTime = _getDateTimeFromPrayerTime(mosque.fajer);
+      }
+
+      DateTime tempDate = DateTime(now.year, now.month, now.day,
+          int.parse(timehm[0]), int.parse(timehm[1]));
 
       myDuration = Duration(
         seconds: tempDate.difference(now).inSeconds,
       );
-      if (myDuration.inHours.remainder(24) < 0) {
+
+      totalTimeBetweenPrayers = nextPrayerTime.difference(previousPrayerTime);
+
+      if (myDuration.isNegative) {
         myDuration = Duration.zero;
       }
     }
   }
 
-  // Step 6
-  void setCountDown() async {
+  DateTime _getDateTimeFromPrayerTime(String prayerTime) {
+    List<String> parts = prayerTime.split(':');
+    int hour = int.parse(parts[0]);
+    int minute = int.parse(parts[1]);
+    DateTime now = DateTime.now();
+    return DateTime(now.year, now.month, now.day, hour, minute);
+  }
+
+  void setCountDown() {
     const reduceSecondsBy = 1;
 
     setState(() {
       final seconds = myDuration.inSeconds - reduceSecondsBy;
       if (seconds < 0) {
-        settimerformadan();
+        setTimerForAdhan();
       } else {
         myDuration = Duration(seconds: seconds);
       }
     });
   }
 
+  // Function to get color based on the time left and total time between prayers
+  Color getColorForTimeLeft() {
+    final totalSeconds = totalTimeBetweenPrayers.inSeconds;
+    final remainingSeconds = myDuration.inSeconds;
+
+    if (totalSeconds == 0) return Colors.green;
+
+    double fraction = remainingSeconds / totalSeconds;
+    fraction =
+        fraction.clamp(0.0, 1.0); // Ensuring the fraction stays within 0 to 1
+
+    // Interpolate between green and red based on the closeness to the next prayer
+    return Color.lerp(Colors.green, Colors.red, 1 - fraction)!;
+  }
+
   @override
   Widget build(BuildContext context) {
     String strDigits(int n) => n.toString().padLeft(2, '0');
 
-    // Step 7
     final hours = strDigits(myDuration.inHours.remainder(24));
     final minutes = strDigits(myDuration.inMinutes.remainder(60));
     final seconds = strDigits(myDuration.inSeconds.remainder(60));
-    return
 
-        // Step 8
-        Text(
+    return Text(
       '$hours:$minutes:$seconds',
-      style: Theme.of(context).textTheme.displayLarge,
+      style: Theme.of(context).textTheme.displayLarge!.copyWith(
+            color: getColorForTimeLeft(), // Dynamically change the color
+          ),
     );
   }
 }

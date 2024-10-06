@@ -21,6 +21,7 @@ import 'package:facemosque/Screen/settingsscreen.dart';
 import 'package:facemosque/providers/buttonclick.dart';
 import 'package:facemosque/widget/bottomnav.dart';
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:swipe/swipe.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
@@ -152,6 +153,7 @@ class _HomeScreenState extends State<HomeScreen> {
     //ask for locationPermission in homeScreen
     //Provider.of<FatchData>(context, listen: false).locationPermission();
     //call mosque form provider (FatchData) if not select mosque it well show Noting in All Text
+
     Mosque mosque = Provider.of<FatchData>(context).mosque;
     Mosques followedMosque = Provider.of<FatchData>(context).mosqueFollow;
     String mosquefollow = followedMosque.name;

@@ -17,19 +17,19 @@ class FatchData with ChangeNotifier {
   // dart has null safty so i most give initzial value
   Mosque mosque = Mosque(
       historicalevent: '',
-      fajer: '',
-      fajeri: '',
-      sharouq: '',
-      dhuhr: '',
-      dhuhri: '',
-      asr: '',
-      asri: '',
-      magrib: '',
-      magribi: '',
-      isha: '',
-      ishai: '',
-      friday_1: '',
-      friday_2: '',
+      fajer: '00:00',
+      fajeri: '00:00',
+      sharouq: '00:00',
+      dhuhr: '00:00',
+      dhuhri: '00:00',
+      asr: '00:00',
+      asri: '00:00',
+      magrib: '00:00',
+      magribi: '00:00',
+      isha: '00:00',
+      ishai: '00:00',
+      friday_1: '00:00',
+      friday_2: '00:00',
       horA: 0,
       qurane: '',
       qurana: '',
@@ -113,7 +113,7 @@ class FatchData with ChangeNotifier {
         );
         final GeocodingApiResponse response =
             await mapbox.forwardGeocoding.request(
-          searchText: '${mosqueFollow.street}. ${mosqueFollow.houseno}',
+          searchText: '\${mosqueFollow.street}. \${mosqueFollow.houseno}',
           fuzzyMatch: true,
           language: 'en',
         );
@@ -156,7 +156,7 @@ class FatchData with ChangeNotifier {
         print(response.body);
       }
       /*Iterable l = json.decode(
-          "${response.body.split('\n').toString().substring(0, response.body.split('\n').toString().length - 3)}]");*/
+          "\${response.body.split('\n').toString().substring(0, response.body.split('\n').toString().length - 3)}]");*/
       Iterable l = json.decode(response.body);
 
       mosquelist =
@@ -236,11 +236,37 @@ class FatchData with ChangeNotifier {
       if (kDebugMode) {
         print(jsonDecode(utf8.decode(response.bodyBytes)));
       }
-      if (response.body == 'Mosque not exist') {
+      if (utf8.decode(response.bodyBytes) == "\"Mosque not exist\"") {
         mosqueFollow = mosquelist.firstWhere(
             (element) => int.parse(element.mosqueid) == int.parse(mosqid));
         prefs.setString('mosqueFollow', json.encode(mosqueFollow.toMap()));
         prefs.setString('mosqid', mosqid);
+
+        // Setting default prayer times to "00:00"
+        mosque = Mosque(
+            historicalevent: '',
+            fajer: '00:00',
+            fajeri: '00:00',
+            sharouq: '00:00',
+            dhuhr: '00:00',
+            dhuhri: '00:00',
+            asr: '00:00',
+            asri: '00:00',
+            magrib: '00:00',
+            magribi: '00:00',
+            isha: '00:00',
+            ishai: '00:00',
+            friday_1: '00:00',
+            friday_2: '00:00',
+            horA: 0,
+            qurane: '',
+            qurana: '',
+            haditha: '',
+            hadithe: '',
+            islamicevent: '',
+            surhnum: '',
+            ayanum: '',
+            dataid: '');
       } else {
         var data = utf8.decode(response.bodyBytes);
         Mosque mosqu = Mosque.fromJson(jsonDecode(data));
@@ -271,19 +297,19 @@ class FatchData with ChangeNotifier {
     try {
       mosque = Mosque(
           historicalevent: '',
-          fajer: '',
-          fajeri: '',
-          sharouq: '',
-          dhuhr: '',
-          dhuhri: '',
-          asr: '',
-          asri: '',
-          magrib: '',
-          magribi: '',
-          isha: '',
-          ishai: '',
-          friday_1: '',
-          friday_2: '',
+          fajer: '00:00',
+          fajeri: '00:00',
+          sharouq: '00:00',
+          dhuhr: '00:00',
+          dhuhri: '00:00',
+          asr: '00:00',
+          asri: '00:00',
+          magrib: '00:00',
+          magribi: '00:00',
+          isha: '00:00',
+          ishai: '00:00',
+          friday_1: '00:00',
+          friday_2: '00:00',
           horA: 0,
           qurane: '',
           qurana: '',

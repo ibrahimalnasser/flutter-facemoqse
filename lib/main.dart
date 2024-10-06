@@ -46,6 +46,9 @@ Future<void> calladan() async {
   alarmadan('isha');
 }
 
+final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
+    GlobalKey<ScaffoldMessengerState>();
+
 //firebase setting for notification
 Future<void> _firebasePushHandler(RemoteMessage message) async {
   SharedPreferences preferences = await SharedPreferences.getInstance();
@@ -71,20 +74,53 @@ Future<void> updateMosuqe() async {
   SharedPreferences preferences = await SharedPreferences.getInstance();
 
   if (preferences.containsKey('mosqid')) {
-    http.Response response = await http.get(
-      Uri.parse(
-        "https://facemosque.eu/api/api.php?client=app&cmd=get_database_method_time&mosque_id=${preferences.getString('mosqid')}",
-      ),
-      headers: {
-        "Connection": "Keep-Alive",
-        'Content-type': 'application/json',
-        'Accept': 'application/json',
-      },
-    ).timeout(const Duration(seconds: 300));
+    try {
+      http.Response response = await http.get(
+        Uri.parse(
+          "https://facemosque.eu/api/api.php?client=app&cmd=get_database_method_time&mosque_id=${preferences.getString('mosqid')}",
+        ),
+        headers: {
+          "Connection": "Keep-Alive",
+          'Content-type': 'application/json',
+          'Accept': 'application/json',
+        },
+      ).timeout(const Duration(seconds: 300));
 
-    var data = utf8.decode(response.bodyBytes);
-    Mosque mosqu = Mosque.fromJson(jsonDecode(data));
-    preferences.setString('mosque', json.encode(mosqu.toMap()));
+      var data = utf8.decode(response.bodyBytes);
+
+      if (data == "Mosque not exist") {
+        // Show a snackbar message for the user
+        final snackBar = SnackBar(
+          content: Text('Prayer times are not updated'),
+        );
+
+        scaffoldMessengerKey.currentState?.showSnackBar(snackBar);
+      } else {
+        // Decode the JSON response
+        Map<String, dynamic> mosqueJson = jsonDecode(data);
+
+        // Ensure that the mosque JSON is properly structured
+        Mosque mosque = Mosque.fromJson(mosqueJson);
+
+        // Store the mosque object in SharedPreferences
+        preferences.setString('mosque', json.encode(mosque.toJson()));
+
+        // Optionally show a success message
+        final snackBar = SnackBar(
+          content: Text('Prayer times have been updated'),
+        );
+
+        scaffoldMessengerKey.currentState?.showSnackBar(snackBar);
+      }
+    } catch (e) {
+      print('Error updating mosque: $e');
+      // Optionally show an error message
+      final snackBar = SnackBar(
+        content: Text('An error occurred while updating prayer times'),
+      );
+
+      scaffoldMessengerKey.currentState?.showSnackBar(snackBar);
+    }
   }
 }
 
@@ -167,97 +203,92 @@ void main() async {
 void alarmadan(String adan) async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   bool lang = false;
-  // read key swatch language if true en else ar from SharedPreferences
+
+  // Read the language key (true for English, false for Arabic) from SharedPreferences
   if (prefs.containsKey('language')) {
     lang = prefs.getBool('language')!;
   }
-  //if user has select mosuqe it well have
-  // time for adan else it well not set alarm
-  //adan pass as parmater 'fajer','dhar'...
-  //in setting Screen we have button for each adan
-  //it store value in SharedPreferences
+
+  // If the user has selected the mosque and adan setting is enabled
   if (prefs.containsKey(adan)) {
-    bool adanstate = prefs.getBool(adan)!;
-    if (adanstate) {
+    bool adanState = prefs.getBool(adan)!;
+    if (adanState) {
       if (prefs.containsKey('mosque')) {
-        Mosque mosque =
-            Mosque.fromJson(json.decode(prefs.getString('mosque')!));
-        if (adan == 'fajer') {
-          //await _notificationHelper.cancel(0);
-          if (mosque.fajer != '') {
-            var timehm = mosque.fajer.split(':');
-            _notificationHelper.scheduledNotification(
-              body: lang,
-              title: lang ? 'الفجر' : adan,
-              hour: int.parse(timehm[0]),
-              minutes: int.parse(timehm[1]),
-              id: 0,
-              sound: 'adan',
-            );
-          }
-        } else if (adan == 'dhuhr') {
-          if (mosque.dhuhr != '') {
-            //  _notificationHelper.cancel(1);
+        // Get the mosque data from SharedPreferences
+        String? mosqueData = prefs.getString('mosque');
 
-            var timehm = mosque.dhuhr.split(':');
+        if (mosqueData != null && mosqueData.isNotEmpty) {
+          try {
+            // Decode the mosque data from JSON string to Map<String, dynamic>
+            Map<String, dynamic> mosqueJson =
+                json.decode(jsonDecode(mosqueData));
 
-            await _notificationHelper.scheduledNotification(
-              body: lang,
-              title: lang ? 'الظهر' : adan,
-              hour: int.parse(timehm[0]),
-              minutes: int.parse(timehm[1]),
-              id: 1,
-              sound: 'adan',
-            );
-            // notifsetting( 0, lang,lang ? 'الفجر' : adan,_nextInstanceOfTenAM(  int.parse(timehm[0]), int.parse(timehm[1])));
-          }
-        } else if (adan == 'asr') {
-          if (mosque.asr != '') {
-            //_notificationHelper.cancel(2);
+            // Parse the mosque object from the decoded JSON map
+            Mosque mosque = Mosque.fromJson(mosqueJson);
 
-            var timehm = mosque.asr.split(':');
-
-            await _notificationHelper.scheduledNotification(
-              body: lang,
-              title: lang ? 'العصر' : adan,
-              hour: int.parse(timehm[0]),
-              minutes: int.parse(timehm[1]),
-              id: 2,
-              sound: 'adan',
-            );
-            // notifsetting( 0, lang,lang ? 'الفجر' : adan,_nextInstanceOfTenAM(  int.parse(timehm[0]), int.parse(timehm[1])));
-          }
-        } else if (adan == 'magrib') {
-          if (mosque.magrib != '') {
-            // await _notificationHelper.cancel(3);
-
-            var timehm = mosque.magrib.split(':');
-
-            _notificationHelper.scheduledNotification(
-              body: lang,
-              title: lang ? 'المغرب' : adan,
-              hour: int.parse(timehm[0]),
-              minutes: int.parse(timehm[1]),
-              id: 3,
-              sound: 'adan',
-            );
-            // notifsetting( 0, lang,lang ? 'الفجر' : adan,_nextInstanceOfTenAM(  int.parse(timehm[0]), int.parse(timehm[1])));
-          }
-        } else if (adan == 'isha') {
-          if (mosque.isha != '') {
-            //await _notificationHelper.cancel(4);
-
-            var timehm = mosque.isha.split(':');
-
-            _notificationHelper.scheduledNotification(
-              body: lang,
-              title: lang ? 'العشاء' : adan,
-              hour: int.parse(timehm[0]),
-              minutes: int.parse(timehm[1]),
-              id: 4,
-              sound: 'adan',
-            );
-            // notifsetting( 0, lang,lang ? 'الفجر' : adan,_nextInstanceOfTenAM(  int.parse(timehm[0]), int.parse(timehm[1])));
+            if (adan == 'fajer') {
+              if (mosque.fajer != '') {
+                var timehm = mosque.fajer.split(':');
+                _notificationHelper.scheduledNotification(
+                  body: lang,
+                  title: lang ? 'الفجر' : adan,
+                  hour: int.parse(timehm[0]),
+                  minutes: int.parse(timehm[1]),
+                  id: 0,
+                  sound: 'adan',
+                );
+              }
+            } else if (adan == 'dhuhr') {
+              if (mosque.dhuhr != '') {
+                var timehm = mosque.dhuhr.split(':');
+                _notificationHelper.scheduledNotification(
+                  body: lang,
+                  title: lang ? 'الظهر' : adan,
+                  hour: int.parse(timehm[0]),
+                  minutes: int.parse(timehm[1]),
+                  id: 1,
+                  sound: 'adan',
+                );
+              }
+            } else if (adan == 'asr') {
+              if (mosque.asr != '') {
+                var timehm = mosque.asr.split(':');
+                _notificationHelper.scheduledNotification(
+                  body: lang,
+                  title: lang ? 'العصر' : adan,
+                  hour: int.parse(timehm[0]),
+                  minutes: int.parse(timehm[1]),
+                  id: 2,
+                  sound: 'adan',
+                );
+              }
+            } else if (adan == 'magrib') {
+              if (mosque.magrib != '') {
+                var timehm = mosque.magrib.split(':');
+                _notificationHelper.scheduledNotification(
+                  body: lang,
+                  title: lang ? 'المغرب' : adan,
+                  hour: int.parse(timehm[0]),
+                  minutes: int.parse(timehm[1]),
+                  id: 3,
+                  sound: 'adan',
+                );
+              }
+            } else if (adan == 'isha') {
+              if (mosque.isha != '') {
+                var timehm = mosque.isha.split(':');
+                _notificationHelper.scheduledNotification(
+                  body: lang,
+                  title: lang ? 'العشاء' : adan,
+                  hour: int.parse(timehm[0]),
+                  minutes: int.parse(timehm[1]),
+                  id: 4,
+                  sound: 'adan',
+                );
+              }
+            }
+          } catch (e) {
+            print('Error parsing mosque data: $e');
           }
         }
       }

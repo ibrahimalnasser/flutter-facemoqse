@@ -86,7 +86,6 @@ dependencies:
 dependency_overrides:
   firebase_core_platform_interface: 4.8.0
 
-
 dev_dependencies:
   flutter_test:
     sdk: flutter
