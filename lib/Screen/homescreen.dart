@@ -29,44 +29,7 @@ import 'package:http/http.dart' as http;
 import '../providers/events.dart';
 
 class ApiService {
-  List<Event> filterEvents(List<Event> events) {
-    DateTime currentDate = DateTime.now();
-    List<Event> tmp = [];
-
-    for (var i = 0; i < events.length; i++) {
-      DateTime eventDate = DateTime.parse(events[i].eventDate);
-      String frequency = events[i].eventFrequencyDay;
-      if (frequency == 'single' && eventDate.isAtSameMomentAs(currentDate)) {
-        tmp.add(events[i]);
-      } else if (frequency == 'weekly' &&
-          currentDate
-              .isBefore(DateTime.parse(events[i].eventFrequencyEndDate))) {
-        if (eventDate.weekday == currentDate.weekday) {
-          tmp.add(events[i]);
-        }
-      } else if (frequency == 'monthly' &&
-          currentDate
-              .isBefore(DateTime.parse(events[i].eventFrequencyEndDate))) {
-        if (eventDate.day == currentDate.day) {
-          tmp.add(events[i]);
-        }
-      } else if (frequency == 'yearly' &&
-          currentDate
-              .isBefore(DateTime.parse(events[i].eventFrequencyEndDate))) {
-        if (eventDate.month == currentDate.month &&
-            eventDate.day == currentDate.day) {
-          tmp.add(events[i]);
-        }
-      } else if (frequency == 'daily' &&
-          currentDate
-              .isBefore(DateTime.parse(events[i].eventFrequencyEndDate))) {
-        tmp.add(events[i]);
-      }
-    }
-    return tmp;
-  }
-
-  Future<List<Event>> fetchEvents(String mosqueID) async {
+  Future<List<Event>> fetchEvents(String mosqueID, DateTime date) async {
     String apiUrl =
         'https://facemosque.com/api/api.php?client=app&cmd=gettingEvents&mosqueId=$mosqueID';
 
@@ -74,21 +37,154 @@ class ApiService {
       final response = await http.get(Uri.parse(apiUrl));
 
       if (response.statusCode == 200) {
-        List<dynamic> jsonResponse = json.decode(response.body);
-        List<Event> events =
-            jsonResponse.map((data) => Event.fromJson(data)).toList();
-        List<Event> filteredEvents = filterEvents(events);
-        _printEvents(filteredEvents);
-        return filteredEvents;
+        // Check if response body is empty
+        if (response.body.isEmpty) {
+          print('Warning: Empty response from API');
+          return [];
+        }
+
+        try {
+          // The response might be a string that needs additional parsing
+          // First, safely decode the JSON response
+          dynamic jsonData = json.decode(response.body);
+
+          // Handle different possible response formats
+          List<dynamic> jsonResponse = []; // Initialize with empty list
+
+          if (jsonData is String) {
+            // If the response is a string, try to parse it again
+            try {
+              jsonData = json.decode(jsonData);
+            } catch (e) {
+              print(
+                  'Error: Response is a string that cannot be parsed as JSON: $jsonData');
+              // If we can't parse further, return empty list
+              return [];
+            }
+          }
+
+          // Now check if we have a list
+          if (jsonData is List) {
+            jsonResponse = jsonData;
+          } else if (jsonData is Map) {
+            // Some APIs wrap the list in a parent object
+            // Check if any key contains a list that might be our events
+            bool foundList = false;
+            for (var key in jsonData.keys) {
+              if (jsonData[key] is List) {
+                jsonResponse = jsonData[key];
+                foundList = true;
+                break;
+              }
+            }
+
+            // If we didn't find a list, create a single-item list with this map
+            if (!foundList) {
+              jsonResponse = [jsonData];
+            }
+          } else {
+            print('Error: Unexpected response format. Response: $jsonData');
+            return [];
+          }
+
+          // Map each item to an Event object with error handling
+          List<Event> events = [];
+          for (var data in jsonResponse) {
+            try {
+              // Make sure data is a map before passing to fromJson
+              if (data is Map<String, dynamic>) {
+                events.add(Event.fromJson(data));
+              } else if (data is Map) {
+                // Convert to Map<String, dynamic> if possible
+                Map<String, dynamic> convertedMap = {};
+                data.forEach((key, value) {
+                  if (key is String) {
+                    convertedMap[key] = value;
+                  }
+                });
+                events.add(Event.fromJson(convertedMap));
+              } else if (data is String) {
+                // If data is a string, try to parse it as JSON
+                try {
+                  Map<String, dynamic> parsedData = json.decode(data);
+                  events.add(Event.fromJson(parsedData));
+                } catch (e) {
+                  print(
+                      'Error: Event data is a string that cannot be parsed as JSON: $data');
+                }
+              } else {
+                print('Error: Event data is neither a map nor a string: $data');
+              }
+            } catch (e) {
+              print('Error parsing event data: $e. Data: $data');
+              // Continue with other events
+            }
+          }
+
+          // Filter and log events
+          List<Event> filteredEvents = filterEvents(events, date);
+          _printEvents(filteredEvents);
+          return filteredEvents;
+        } catch (parseError) {
+          print(
+              'Error parsing JSON response: $parseError. Response: ${response.body}');
+          return [];
+        }
       } else {
+        print(
+            'API error: HTTP status ${response.statusCode}. Response: ${response.body}');
         return []; // Return an empty list if the response is not successful
       }
     } catch (e) {
+      print('Network or other error: $e');
       return []; // Return an empty list if there is an error during the request
     }
   }
 
+  List<Event> filterEvents(List<Event> events, DateTime currentDate) {
+    List<Event> tmp = [];
+
+    for (var i = 0; i < events.length; i++) {
+      try {
+        DateTime eventDate = DateTime.parse(events[i].eventDate);
+        String frequency = events[i].eventFrequencyDay;
+
+        if (frequency == 'single' && eventDate.isAtSameMomentAs(currentDate)) {
+          tmp.add(events[i]);
+        } else if (frequency == 'weekly' &&
+            currentDate
+                .isBefore(DateTime.parse(events[i].eventFrequencyEndDate))) {
+          if (eventDate.weekday == currentDate.weekday) {
+            tmp.add(events[i]);
+          }
+        } else if (frequency == 'monthly' &&
+            currentDate
+                .isBefore(DateTime.parse(events[i].eventFrequencyEndDate))) {
+          if (eventDate.day == currentDate.day) {
+            tmp.add(events[i]);
+          }
+        } else if (frequency == 'yearly' &&
+            currentDate
+                .isBefore(DateTime.parse(events[i].eventFrequencyEndDate))) {
+          if (eventDate.month == currentDate.month &&
+              eventDate.day == currentDate.day) {
+            tmp.add(events[i]);
+          }
+        } else if (frequency == 'daily' &&
+            currentDate
+                .isBefore(DateTime.parse(events[i].eventFrequencyEndDate))) {
+          tmp.add(events[i]);
+        }
+      } catch (e) {
+        print('Error filtering event: $e. Event: ${events[i].eventName}');
+        // Skip this event and continue with others
+      }
+    }
+    return tmp;
+  }
+
   void _printEvents(List<Event> events) {
+    print('Found ${events.length} events for today:');
     for (Event event in events) {
       print(
           'Event Name: ${event.eventName}, Date: ${event.eventDate}, Time: ${event.eventTime}');
@@ -120,6 +216,8 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final NotificationHelper _notificationHelper = NotificationHelper();
   late Future<List<Event>> futureEvents;
+  DateTime _selectedDate =
+      DateTime.now(); // Add this to track the selected date
 
   @override
   void initState() {
@@ -138,6 +236,52 @@ class _HomeScreenState extends State<HomeScreen> {
     // This should be implemented according to your notification system
   }
 
+  // Add this method to fetch events for a specific date
+  Future<List<Event>> _fetchEventsByDate(String mosqueID, DateTime date) async {
+    // First fetch all events
+    ApiService apiService = ApiService();
+    List<Event> allEvents = await apiService.fetchEvents(mosqueID, date);
+
+    // Filter events for the selected date
+    String formattedDate =
+        "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
+
+    return allEvents.where((event) {
+      // For one-time events, check if the date matches
+      if (event.eventFrequencyDay == 'single') {
+        return event.eventDate == formattedDate;
+      }
+
+      // For recurring events, check according to frequency
+      DateTime eventStartDate = DateTime.parse(event.eventDate);
+      DateTime eventEndDate = DateTime.parse(event.eventFrequencyEndDate);
+
+      if (date.isAfter(eventEndDate)) {
+        return false;
+      }
+
+      if (event.eventFrequencyDay == 'daily') {
+        return date.isAfter(eventStartDate) ||
+            date.isAtSameMomentAs(eventStartDate);
+      } else if (event.eventFrequencyDay == 'weekly') {
+        return date.weekday == eventStartDate.weekday &&
+            (date.isAfter(eventStartDate) ||
+                date.isAtSameMomentAs(eventStartDate));
+      } else if (event.eventFrequencyDay == 'monthly') {
+        return date.day == eventStartDate.day &&
+            (date.isAfter(eventStartDate) ||
+                date.isAtSameMomentAs(eventStartDate));
+      } else if (event.eventFrequencyDay == 'yearly') {
+        return date.day == eventStartDate.day &&
+            date.month == eventStartDate.month &&
+            (date.isAfter(eventStartDate) ||
+                date.isAtSameMomentAs(eventStartDate));
+      }
+
+      return false;
+    }).toList();
+  }
+
   @override
   Widget build(BuildContext context) {
     // Get mosque data from provider
@@ -146,7 +290,8 @@ class _HomeScreenState extends State<HomeScreen> {
     String mosquefollow = followedMosque.name;
     String msoqueFollowEmail =
         Provider.of<FatchData>(context).mosqueFollow.Email;
-    futureEvents = ApiService().fetchEvents(followedMosque.mosqueid);
+    DateTime todayDate = DateTime.now();
+    futureEvents = ApiService().fetchEvents(followedMosque.mosqueid, todayDate);
 
     // Get language settings
     Map language = Provider.of<Buttonclickp>(context).languagepro;
@@ -270,6 +415,19 @@ class _HomeScreenState extends State<HomeScreen> {
         // Mosque Header
         _buildMosqueHeader(
             context, mosquefollow, language, mosque, constraints),
+        Center(
+          child: mosque.isha != ''
+              ? CircularCountdownTimer(
+                  language: language) // Pass language to the timer
+              : Text(
+                  language['Select the mosque to see the last prayer'],
+                  style: Theme.of(context)
+                      .textTheme
+                      .displayLarge!
+                      .copyWith(fontSize: 15),
+                  textAlign: TextAlign.center,
+                ),
+        ),
 
         // Prayer Times Panel
         isPortrait
@@ -280,7 +438,7 @@ class _HomeScreenState extends State<HomeScreen> {
         _buildNextPrayerAndHadithPanel(context, mosque, language, constraints),
 
         // Events Panel
-        _buildEventsPanel(context, language, constraints),
+        _buildEventsPanel(context, language, constraints, followedMosque),
       ],
     );
   }
@@ -533,24 +691,7 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          // Next Prayer Title
-          titlel(language['nextparer']),
-
-          // Countdown Timer
-          SizedBox(
-            height: 60,
-            child: mosque.isha != ''
-                ? const CountdownTimer()
-                : Text(
-                    language['Select the mosque to see the last prayer'],
-                    style: Theme.of(context)
-                        .textTheme
-                        .displayLarge!
-                        .copyWith(fontSize: 15),
-                    textAlign: TextAlign.center,
-                  ),
-          ),
-
+          // Removed the separate next prayer title as it's now part of the timer
           // Hadith or Quran title
           titlel(mosque.horA == 0
               ? language['todayHadith']
@@ -582,8 +723,91 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildEventsPanel(
-      BuildContext context, Map language, BoxConstraints constraints) {
+// Preserved original styling with both date display and date picker functionality
+  Widget _buildEventDateSelector(BuildContext context, Map language) {
+    // Create a custom title that includes both the original styling and the date
+    return GestureDetector(
+      onTap: () => _showDatePicker(context),
+      child: Container(
+        margin: const EdgeInsets.all(10),
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          color: const Color(0xFF94C973),
+        ),
+        alignment: Alignment.center,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Events text
+            AutoSizeText(
+              language['events'] ?? 'Events',
+              style: Theme.of(context).textTheme.displayLarge,
+              textAlign: TextAlign.center,
+              minFontSize: 14,
+            ),
+            const SizedBox(height: 8), // Vertical spacing
+            // Date display
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                AutoSizeText(
+                  DateFormat('MMM d, yyyy').format(_selectedDate),
+                  style: Theme.of(context).textTheme.displayLarge?.copyWith(
+                        fontSize: 14,
+                      ),
+                  textAlign: TextAlign.center,
+                  minFontSize: 12,
+                ),
+                const SizedBox(width: 5),
+                const Icon(
+                  Icons.calendar_today,
+                  color: Colors.white,
+                  size: 16,
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+// New method to show the date picker
+  void _showDatePicker(BuildContext context) async {
+    final DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: _selectedDate,
+      firstDate: DateTime(2020),
+      lastDate: DateTime(2030),
+      builder: (BuildContext context, Widget? child) {
+        return Theme(
+          data: ThemeData.light().copyWith(
+            colorScheme: const ColorScheme.light(
+              primary: Color(0xFF94C973), // Header background color
+              onPrimary: Colors.white, // Header text color
+              surface: Colors.white, // Dialog background color
+              onSurface: Colors.black, // Dialog text color
+            ),
+            dialogBackgroundColor: Colors.white,
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (pickedDate != null && pickedDate != _selectedDate) {
+      setState(() {
+        _selectedDate = pickedDate;
+      });
+    }
+  }
+
+  // Updated events panel with date navigation
+  Widget _buildEventsPanel(BuildContext context, Map language,
+      BoxConstraints constraints, Mosques followedMosque) {
     return Container(
       width: constraints.maxWidth * 0.95,
       margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
@@ -599,37 +823,119 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          titlel(language['events']),
+          // Events title with date selector
+          _buildEventDateSelector(context, language),
 
-          // Events List
-          FutureBuilder<List<Event>>(
-            future: futureEvents,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator());
-              } else if (snapshot.hasError) {
-                return Center(child: Text('Error: ${snapshot.error}'));
-              } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
-                List<Event> events = snapshot.data!;
-                return ListView.builder(
-                  physics: const NeverScrollableScrollPhysics(),
-                  shrinkWrap: true,
-                  padding: const EdgeInsets.all(5),
-                  itemCount: events.length,
-                  itemBuilder: (context, index) {
-                    return _buildEventCard(context, events[index], constraints);
+          // Add side navigation arrows around the event list
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              // Left arrow for navigation
+              Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(30),
+                  onTap: () {
+                    setState(() {
+                      _selectedDate =
+                          _selectedDate.subtract(const Duration(days: 1));
+                    });
                   },
-                );
-              } else {
-                return const Center(
                   child: Padding(
-                    padding: EdgeInsets.all(16.0),
-                    child: Text('No events found',
-                        style: TextStyle(color: Colors.white)),
+                    padding: const EdgeInsets.all(4.0),
+                    child: Container(
+                      height: 40,
+                      width: 25,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF94C973).withOpacity(0.5),
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      child: const Icon(
+                        Icons.arrow_back_ios,
+                        color: Colors.white,
+                        size: 18,
+                      ),
+                    ),
                   ),
-                );
-              }
-            },
+                ),
+              ),
+
+              // Events List
+              Expanded(
+                child: FutureBuilder<List<Event>>(
+                  future: _fetchEventsByDate(
+                      followedMosque.mosqueid, _selectedDate),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(
+                          child: Padding(
+                        padding: EdgeInsets.symmetric(vertical: 30.0),
+                        child: CircularProgressIndicator(),
+                      ));
+                    } else if (snapshot.hasError) {
+                      return Center(
+                          child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 30.0),
+                        child: Text('Error: ${snapshot.error}',
+                            style: const TextStyle(color: Colors.white)),
+                      ));
+                    } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+                      List<Event> events = snapshot.data!;
+                      return ListView.builder(
+                        physics: const NeverScrollableScrollPhysics(),
+                        shrinkWrap: true,
+                        padding: const EdgeInsets.all(5),
+                        itemCount: events.length,
+                        itemBuilder: (context, index) {
+                          return _buildEventCard(
+                              context, events[index], constraints);
+                        },
+                      );
+                    } else {
+                      return Center(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 30.0),
+                          child: Text(
+                            'No events on ${DateFormat('MMM d, yyyy').format(_selectedDate)}',
+                            style: const TextStyle(color: Colors.white),
+                          ),
+                        ),
+                      );
+                    }
+                  },
+                ),
+              ),
+
+              // Right arrow for navigation
+              Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(30),
+                  onTap: () {
+                    setState(() {
+                      _selectedDate =
+                          _selectedDate.add(const Duration(days: 1));
+                    });
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.all(4.0),
+                    child: Container(
+                      height: 40,
+                      width: 25,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF94C973).withOpacity(0.5),
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      child: const Icon(
+                        Icons.arrow_forward_ios,
+                        color: Colors.white,
+                        size: 18,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -681,10 +987,33 @@ class _HomeScreenState extends State<HomeScreen> {
                           maxLines: 1,
                         ),
                         const SizedBox(height: 4),
-                        Text(
-                          event.participantName,
-                          style: const TextStyle(
-                              color: Color(0xffD1B000), fontSize: 10),
+                        Row(
+                          children: [
+                            Text(
+                              event.participantName,
+                              style: const TextStyle(
+                                  color: Color(0xffD1B000), fontSize: 10),
+                            ),
+                            const SizedBox(width: 8),
+                            // Add frequency indicator
+                            if (event.eventFrequencyDay != 'single')
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 6, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color:
+                                      const Color(0xffD1B000).withOpacity(0.2),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Text(
+                                  _getFrequencyText(event.eventFrequencyDay),
+                                  style: const TextStyle(
+                                    color: Color(0xffD1B000),
+                                    fontSize: 8,
+                                  ),
+                                ),
+                              ),
+                          ],
                         ),
                       ],
                     ),
@@ -703,6 +1032,22 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
         ));
+  }
+
+  // Helper method to show frequency text
+  String _getFrequencyText(String frequency) {
+    switch (frequency) {
+      case 'daily':
+        return 'Daily';
+      case 'weekly':
+        return 'Weekly';
+      case 'monthly':
+        return 'Monthly';
+      case 'yearly':
+        return 'Yearly';
+      default:
+        return '';
+    }
   }
 
   Container titlel(String titlel) {
